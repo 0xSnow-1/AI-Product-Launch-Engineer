@@ -71,3 +71,29 @@ ai-product-launch-engine/
 ├── .env.example
 ├── .gitignore
 └── README.md
+
+
+
+
+
+
+
+
+src/
+│
+├── agents/
+│   ├── supervisor.py
+│   ├── market_researcher.py
+│   ├── gtm_strategist.py
+│   └── technical_architect.py
+│
+└── prompts/
+    ├── supervisor/
+    │   └── v1.yaml
+    └── subagents/
+        ├── market_researcher/
+        │   └── v1.yaml
+        ├── gtm_strategist/
+        │   └── v1.yaml
+        └── technical_architect/
+            └── v1.yaml

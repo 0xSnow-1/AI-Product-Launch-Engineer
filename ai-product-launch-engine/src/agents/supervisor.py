@@ -4,6 +4,7 @@ from langchain.agents.middleware import TodoListMiddleware
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from pathlib import Path
+import yaml
 
 load_dotenv()
 
@@ -23,7 +24,17 @@ BEDROCK_REGION = os.getenv("BEDROCK_REGION", "us-east-1")
 llm = ChatBedrockConverse(model=BEDROCK_MODEL_ID, region_name=BEDROCK_REGION)
 
 
-WORKSPACE_DIR = Path(__file__).resolve().parents[1] / "workspace" / "research" 
+PROMPT = "v1"
+
+PROMPT_DIR = Path(__file__).resolve().parents[1] / 'prompts' / 'supervisor' / f"{PROMPT}.yaml"
+
+prompt_config = yaml.safe_load(
+    PROMPT_DIR.read_text(encoding='utf-8')
+)
+
+SYSTEM_PROMPT = prompt_config["system_prompt"]
+
+WORKSPACE_DIR = Path(__file__).resolve().parents[2] / "workspace" / "research" 
 WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -35,19 +46,20 @@ You are an Expert Formatter, made to write gmail's ina format that is so concise
 tavily_tool = TavilySearchResults(max_results=3)
 
 # Use the correct provider format or model string for Bedrock / Gemini
-mainAgent = create_deep_agent(
-    model= llm,
-    backend=FilesystemBackend(
-        root_dir=WORKSPACE_DIR,
-        virtual_mode=True
-    ),
-    system_prompt=gmail_system_prompt,
-)
-#tools=[tavily_tool, TodoListMiddleware()],
+if __name__ == "__main__":
+    mainAgent = create_deep_agent(
+        model=llm,
+        backend=FilesystemBackend(
+            root_dir=WORKSPACE_DIR,
+            virtual_mode=True
+        ),
+        system_prompt=gmail_system_prompt,
+    )
+    # tools=[tavily_tool, TodoListMiddleware()],
 
-user_input = "Create a gmail draft for my professor, he's name is Juan and i want this to be about me, a 24 year old no degree wanting to join his engineering team at anthopic"
+    user_input = "Create a gmail draft for my professor, he's name is Juan and i want this to be about me, a 24 year old no degree wanting to join his engineering team at anthopic"
 
-result = mainAgent.stream_events({"messages": [{"role": "user", "content": user_input}]}, version='v3')
+    result = mainAgent.stream_events({"messages": [{"role": "user", "content": user_input}]}, version='v3')
 
-for i in result.values:
-    i["messages"][-1].pretty_print()
+    for i in result.values:
+        i["messages"][-1].pretty_print()
