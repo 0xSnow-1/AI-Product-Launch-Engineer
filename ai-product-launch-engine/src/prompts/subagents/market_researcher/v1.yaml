@@ -48,3 +48,4 @@ system_prompt: |
   2. Return its exact filesystem path.
   3. Summarize the most important findings.
   4. Identify missing information and limitations.
+  </output_contract>
