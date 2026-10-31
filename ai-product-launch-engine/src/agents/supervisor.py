@@ -38,10 +38,7 @@ WORKSPACE_DIR = Path(__file__).resolve().parents[2] / "workspace" / "research"
 WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-gmail_system_prompt = """
 
-You are an Expert Formatter, made to write gmail's ina format that is so concise tailord towards recruiters from a student/candidate's perspective, you are to save results under /home/snowaflic/GTM-autonomous/ai-product-launch-engine/src/workspace/research
-"""
 # Use TavilySearchResults with max_results instead of Topic
 tavily_tool = TavilySearchResults(max_results=3)
 
@@ -51,13 +48,12 @@ if __name__ == "__main__":
         model=llm,
         backend=FilesystemBackend(
             root_dir=WORKSPACE_DIR,
-            virtual_mode=True
-        ),
-        system_prompt=gmail_system_prompt,
+            virtual_mode=True),
+        system_prompt=SYSTEM_PROMPT,
+        tools=[tavily_tool, TodoListMiddleware()],
     )
-    # tools=[tavily_tool, TodoListMiddleware()],
 
-    user_input = "Create a gmail draft for my professor, he's name is Juan and i want this to be about me, a 24 year old no degree wanting to join his engineering team at anthopic"
+    user_input = "Create a launch blueprint for an AI meeting assistant for small recruiting teams."
 
     result = mainAgent.stream_events({"messages": [{"role": "user", "content": user_input}]}, version='v3')
 

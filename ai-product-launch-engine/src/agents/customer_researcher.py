@@ -1,6 +1,6 @@
-"""Technical architecture subagent.
+"""Customer research subagent.
 
-Designs the MVP architecture, data model, APIs, and implementation plan.
+Defines ideal customer profiles, personas, customer problems, and buying triggers.
 """
 
 from pathlib import Path
@@ -15,7 +15,7 @@ load_dotenv()
 
 import os
 
-PROMPT_DIR = Path(__file__).resolve().parents[1] / "prompts" / "subagents" / "technical_architect" / "v1.yaml"
+PROMPT_DIR = Path(__file__).resolve().parents[1] / "prompts" / "subagents" / "customer_researcher" / "v1.yaml"
 
 SYSTEM_PROMPT = yaml.safe_load(PROMPT_DIR.read_text(encoding="utf-8"))["system_prompt"]
 
@@ -27,7 +27,7 @@ llm = ChatBedrockConverse(model=BEDROCK_MODEL_ID, region_name=BEDROCK_REGION)
 WORKSPACE_DIR = Path(__file__).resolve().parents[2] / "workspace" / "research"
 WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
 
-technical_architect_agent = create_deep_agent(
+customer_researcher_agent = create_deep_agent(
     model=llm,
     backend=FilesystemBackend(
         root_dir=WORKSPACE_DIR,

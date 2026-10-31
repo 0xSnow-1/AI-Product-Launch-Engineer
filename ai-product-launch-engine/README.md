@@ -1,99 +1,26 @@
-# Project:
-AI Product Launch Engineer
+# AI Product Launch Engineer
 
-- An autonomous AI system that transforms a product idea into an evidence-backed product launch blueprint.
+Implementation package for the AI Product Launch Engineer.
 
-## Scope
-- Who are the users? what are their problems?
-- what type of outcome do we want to improve?
-- Where does the agent fit in the problem/workflow?
-- Level of Autonomy?
+See the [root README](../README.md) for the project overview, architecture, and setup instructions.
 
-Assumptions:
+## Agent entry points
 
-- what are the data we gonna be using to test this?
-- What are the inputs?
-- what are the outputs?
-A structured, validated launch blueprint with supporting research, decisions, and generated project artifacts.
-- operational costs?
-- Risk in action?
+- `src/agents/supervisor.py`
+- `src/agents/market_researcher.py`
+- `src/agents/customer_researcher.py`
+- `src/agents/gtm_strategist.py`
 
+## Prompt layout
 
-(HARNESS ARCHITECTURE)
-Does the agent need to read anything to reach it's objective?
-- No, no rag is needed here
+- `src/prompts/supervisor/v1.yaml`
+- `src/prompts/subagents/market_researcher/v1.yaml`
+- `src/prompts/subagents/customer_researcher/v1.yaml`
+- `src/prompts/subagents/gtm_strategist/v1.yaml`
 
-Does the agent need to Act on anything?
-- yes, it must implemend a Todo list writing the needed tasks
-- it must delegate the tasks to subagents
-- it must return all the results into the VFS
-- it must read, convert the deliverable into a .zip back to the user.
+## Run
 
-
-Does the agent need to Have any Memories?
-
-- yes, Working memory (default) and Procedural memory (SKILLS.md) for all 3 sub agents
-
-
-What are the subagents to implement?
-
-- Market research subagent (Research Competitors, Market Opportunities, Evidences)
-- Customer Research ICP, personas, customer problems
-- GTM Strategy positining, messaging, distribution
-
-Structure:
-ai-product-launch-engine/
-│
-├── main.py
-├── src/
-│   ├── prompts.py
-│   ├── schemas.py
-│   ├── config.py
-│   │
-│   ├── tools/
-│   │   └── __init__.py
-│   │
-│   ├── subagents/
-│   │   └── __init__.py
-│   │
-│   ├── workflows/
-│   │   └── __init__.py
-│   │
-│   └── backends/
-│       └── __init__.py
-├── evals/
-│   ├── datasets/
-│   ├── evaluators.py
-│   └── run_evals.py
-├── tests/
-├── langgraph.json
-├── pyproject.toml
-├── .env.example
-├── .gitignore
-└── README.md
-
-
-
-
-
-
-
-
-src/
-│
-├── agents/
-│   ├── supervisor.py
-│   ├── market_researcher.py
-│   ├── gtm_strategist.py
-│   └── technical_architect.py
-│
-└── prompts/
-    ├── supervisor/
-    │   └── v1.yaml
-    └── subagents/
-        ├── market_researcher/
-        │   └── v1.yaml
-        ├── gtm_strategist/
-        │   └── v1.yaml
-        └── technical_architect/
-            └── v1.yaml
+```bash
+cd src
+python -m agents.supervisor
+```
