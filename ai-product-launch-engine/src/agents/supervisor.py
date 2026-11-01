@@ -5,8 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence, TextIO
 
 from dotenv import load_dotenv
 
@@ -48,6 +49,46 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _chunk_text(message: Any) -> str:
+    """Return visible text from a streamed LangChain message chunk."""
+
+    content = getattr(message, "content", "")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(
+            item.get("text", "") if isinstance(item, dict) else str(item)
+            for item in content
+        )
+    return ""
+
+
+def stream_response(agent: Any, agent_input: dict[str, object], config: dict[str, object], output: TextIO) -> None:
+    """Stream task events and response text so a live run never looks idle."""
+
+    print("[progress] Starting supervisor.", file=output, flush=True)
+    print("[progress] Waiting for Bedrock. The first response can take several minutes.", file=output, flush=True)
+    printed_text = False
+    for mode, payload in agent.stream(
+        agent_input,
+        config=config,
+        stream_mode=["messages", "tasks"],
+    ):
+        if mode == "tasks":
+            print("[progress] Task event received.", file=output, flush=True)
+            continue
+        if mode != "messages":
+            continue
+        message, _metadata = payload
+        text = _chunk_text(message)
+        if text:
+            print(text, end="", file=output, flush=True)
+            printed_text = True
+    if printed_text:
+        print(file=output, flush=True)
+    print("[progress] Run completed.", file=output, flush=True)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run one real launch request. This is the only path that invokes a model."""
 
@@ -67,26 +108,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     callbacks = []
     if "LAUNCH_ENGINE_TRANSCRIPT_PATH" in os.environ:
         callbacks.append(JsonlCallbackHandler(Path(os.environ["LAUNCH_ENGINE_TRANSCRIPT_PATH"])))
-    result = build_supervisor(settings).invoke(
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        {
-                            "idea": request.idea,
-                            "audience": request.audience,
-                            "constraints": dict(request.constraints),
-                            "project_slug": request.project_slug,
-                            "controlled_fixtures": raw_request.get("fixtures", []),
-                        }
-                    ),
-                }
-            ]
-        },
-        config={"callbacks": callbacks},
+    agent_input = {
+        "messages": [
+            {
+                "role": "user",
+                "content": json.dumps(
+                    {
+                        "idea": request.idea,
+                        "audience": request.audience,
+                        "constraints": dict(request.constraints),
+                        "project_slug": request.project_slug,
+                        "controlled_fixtures": raw_request.get("fixtures", []),
+                    }
+                ),
+            }
+        ]
+    }
+    stream_response(
+        build_supervisor(settings),
+        agent_input,
+        {"callbacks": callbacks},
+        sys.stdout,
     )
-    print(result["messages"][-1].content)
     return 0
 
 

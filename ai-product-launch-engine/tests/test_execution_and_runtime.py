@@ -3,18 +3,23 @@
 from __future__ import annotations
 
 import json
+import io
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
 from evals.executor import execute_task
 from evals.task_loader import load_tasks
+from agents.supervisor import stream_response
 from src.config import Settings
 from src.schemas import LaunchRequest
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASETS = PROJECT_ROOT / "evals" / "datasets"
 FIXTURES = PROJECT_ROOT / "evals" / "fixtures"
 
@@ -92,6 +97,20 @@ class RuntimeFoundationTests(unittest.TestCase):
             content = prompt.read_text(encoding="utf-8")
             self.assertNotIn("/workspace/research/", content)
         self.assertIn("/projects/{project_slug}/research/market.md", active_prompts[1].read_text(encoding="utf-8"))
+
+    def test_stream_response_prints_progress_and_model_text(self) -> None:
+        class FakeAgent:
+            def stream(self, *args, **kwargs):
+                yield "tasks", {"id": "task-1", "name": "agent"}
+                yield "messages", (type("Chunk", (), {"content": "Working"})(), {})
+                yield "messages", (type("Chunk", (), {"content": " now"})(), {})
+
+        output = io.StringIO()
+        stream_response(FakeAgent(), {"messages": []}, {}, output)
+        text = output.getvalue()
+        self.assertIn("[progress] Task event", text)
+        self.assertIn("Working now", text)
+        self.assertIn("[progress] Run completed.", text)
 
 
 if __name__ == "__main__":
