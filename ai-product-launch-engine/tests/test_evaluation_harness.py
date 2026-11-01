@@ -63,7 +63,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.task = load_tasks(SEED_DATASET)[0]
 
     def test_loader_reads_one_valid_seed_task(self) -> None:
-        tasks = load_tasks(SEED_DATASET.parent)
+        tasks = load_tasks(SEED_DATASET)
         self.assertEqual([task.id for task in tasks], ["b2b_recruiting_meeting_assistant"])
 
     def test_complete_trial_passes_all_deterministic_graders(self) -> None:
@@ -110,7 +110,7 @@ class EvaluationHarnessTests(unittest.TestCase):
     def test_runner_validates_the_dataset_without_trial_artifacts(self) -> None:
         output = io.StringIO()
         with redirect_stdout(output):
-            exit_code = main(["--datasets", str(SEED_DATASET.parent), "--validate-only"])
+            exit_code = main(["--datasets", str(SEED_DATASET), "--validate-only"])
         report = json.loads(output.getvalue())
         self.assertEqual(exit_code, 0)
         self.assertTrue(report["valid"])
@@ -125,11 +125,12 @@ class EvaluationHarnessTests(unittest.TestCase):
                 exit_code = main(
                     [
                         "--datasets",
-                        str(SEED_DATASET.parent),
+                        str(SEED_DATASET),
                         "--trial-root",
                         str(trial_collection),
                     ]
                 )
+            self.assertTrue((trial_collection / self.task.id / "grader_results.json").is_file())
         report = json.loads(output.getvalue())
         self.assertEqual(exit_code, 0)
         self.assertTrue(report["passed"])

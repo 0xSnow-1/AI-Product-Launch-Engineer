@@ -1,0 +1,18 @@
+[project]
+name = "ai-product-launch-engine"
+version = "0.1.0"
+description = "Evidence-backed product launch blueprint agent."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "deepagents>=0.7.32",
+    "langchain-aws>=1.9.1",
+    "langchain-community>=0.4.2",
+    "langchain-tavily>=0.2.18",
+    "python-dotenv>=1.2.4",
+    "pyyaml>=6.0.3",
+    "tavily-python>=0.8.5",
+]
+
+[tool.uv]
+package = false

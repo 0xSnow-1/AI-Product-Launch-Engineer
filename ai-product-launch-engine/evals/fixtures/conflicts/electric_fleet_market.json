@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "title": "Market report A",
+      "url": "https://fixtures.example.test/fleet-report-a",
+      "content": "The market is worth $2 billion."
+    },
+    {
+      "title": "Market report B",
+      "url": "https://fixtures.example.test/fleet-report-b",
+      "content": "The market is worth $9 billion and uses a different market definition."
+    }
+  ]
+}

@@ -13,14 +13,16 @@ See the [root README](../README.md) for the project overview, architecture, and 
 
 ## Prompt layout
 
-- `src/prompts/supervisor/v1.yaml`
-- `src/prompts/subagents/market_researcher/v1.yaml`
-- `src/prompts/subagents/customer_researcher/v1.yaml`
-- `src/prompts/subagents/gtm_strategist/v1.yaml`
+- `src/prompts/supervisor/v2.yaml`
+- `src/prompts/subagents/market_researcher/v2.yaml`
+- `src/prompts/subagents/customer_researcher/v2.yaml`
+- `src/prompts/subagents/gtm_strategist/v2.yaml`
 
 ## Run
 
 ```bash
-cd src
-python -m agents.supervisor
+uv sync
+uv run python main.py --help
 ```
+
+See `evals/RUNBOOK.md` for eval commands and artifact locations.

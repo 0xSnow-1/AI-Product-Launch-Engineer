@@ -1,37 +1,19 @@
-"""GTM strategy subagent.
+"""Go-to-market strategy subagent registration."""
 
-Develops ICPs, personas, positioning, messaging, and distribution plans.
-"""
+from __future__ import annotations
 
-from pathlib import Path
+from typing import Any
 
-import yaml
-from dotenv import load_dotenv
-from langchain_aws import ChatBedrockConverse
-from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
+from agents.common import load_prompt
 
-load_dotenv()
 
-import os
+def definition(model: Any, search_tool: Any) -> dict[str, Any]:
+    """Return the declarative subagent used by the supervisor."""
 
-PROMPT_DIR = Path(__file__).resolve().parents[1] / "prompts" / "subagents" / "gtm_strategist" / "v1.yaml"
-
-SYSTEM_PROMPT = yaml.safe_load(PROMPT_DIR.read_text(encoding="utf-8"))["system_prompt"]
-
-BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-haiku-4-5-20251001-v1:0")
-BEDROCK_REGION = os.getenv("BEDROCK_REGION", "us-east-1")
-
-llm = ChatBedrockConverse(model=BEDROCK_MODEL_ID, region_name=BEDROCK_REGION)
-
-WORKSPACE_DIR = Path(__file__).resolve().parents[2] / "workspace" / "research"
-WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
-
-gtm_strategist_agent = create_deep_agent(
-    model=llm,
-    backend=FilesystemBackend(
-        root_dir=WORKSPACE_DIR,
-        virtual_mode=True,
-    ),
-    system_prompt=SYSTEM_PROMPT,
-)
+    return {
+        "name": "gtm_strategist",
+        "description": "Create positioning, messaging, and distribution strategy. Write gtm.md.",
+        "model": model,
+        "tools": [search_tool],
+        "system_prompt": load_prompt("subagents", "gtm_strategist", "v2.yaml"),
+    }

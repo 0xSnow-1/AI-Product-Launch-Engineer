@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "title": "Competitor profile",
+      "url": "https://fixtures.example.test/hr-profile",
+      "content": "Vendor A claims it is the only predictive HR analytics platform."
+    },
+    {
+      "title": "Vendor A product page",
+      "url": "https://fixtures.example.test/hr-product",
+      "content": "Vendor A offers workforce analytics."
+    }
+  ]
+}

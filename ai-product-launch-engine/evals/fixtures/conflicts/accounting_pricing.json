@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "title": "Vendor pricing page",
+      "url": "https://fixtures.example.test/vendor-pricing",
+      "content": "The starter plan costs $49 per month."
+    },
+    {
+      "title": "Partner directory",
+      "url": "https://fixtures.example.test/partner-pricing",
+      "content": "The same starter plan costs $79 per month."
+    }
+  ]
+}
