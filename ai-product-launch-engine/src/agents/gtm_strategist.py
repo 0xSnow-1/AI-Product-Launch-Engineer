@@ -14,6 +14,6 @@ def definition(model: Any, search_tool: Any) -> dict[str, Any]:
         "name": "gtm_strategist",
         "description": "Create positioning, messaging, and distribution strategy. Write gtm.md.",
         "model": model,
-        "tools": [search_tool],
+        "tools": [],
         "system_prompt": load_prompt("subagents", "gtm_strategist", "v2.yaml"),
     }

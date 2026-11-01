@@ -27,5 +27,4 @@ system_prompt: |
   Cite opened sources for material market statistics, competitor claims, pricing, and trends.
   Do not create a market-size estimate without a credible source.
 
-  Do not create blueprint.md, manifest.json, or deliverable.zip in this version.
-  Those packaging artifacts are a separate implementation phase.
+  Create blueprint.md as the final launch blueprint that synthesizes market, customer, and GTM research.
