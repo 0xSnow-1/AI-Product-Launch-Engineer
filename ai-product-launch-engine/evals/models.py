@@ -10,6 +10,7 @@ from typing import Any, Mapping
 
 TASK_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 PROJECT_SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+FIXTURE_PATH_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_/-]*\.json$")
 VALID_SUITES = frozenset({"capability", "regression"})
 REQUIRED_MANIFEST_AGENTS = frozenset(
     {"market_researcher", "customer_researcher", "gtm_strategist", "supervisor"}
@@ -85,6 +86,14 @@ class TaskExpectation:
 
 
 @dataclass(frozen=True)
+class EvaluationFixture:
+    """One controlled source fixture exposed to an isolated trial."""
+
+    path: str
+    purpose: str
+
+
+@dataclass(frozen=True)
 class EvaluationTask:
     """One validated JSON task record."""
 
@@ -96,6 +105,7 @@ class EvaluationTask:
     expected: TaskExpectation
     guardrails: tuple[str, ...]
     tracked_metrics: tuple[str, ...]
+    fixtures: tuple[EvaluationFixture, ...]
     source: Path
     line_number: int
 
@@ -181,6 +191,26 @@ class EvaluationTask:
         if missing_agents:
             raise _error(source, line_number, f"expected.manifest_agents is missing: {', '.join(sorted(missing_agents))}")
 
+        raw_fixtures = raw.get("fixtures", [])
+        if not isinstance(raw_fixtures, list):
+            raise _error(source, line_number, "fixtures must be a list")
+        fixtures: list[EvaluationFixture] = []
+        fixture_paths: set[str] = set()
+        for fixture in raw_fixtures:
+            fixture_data = _mapping(fixture, "fixtures entry", source, line_number)
+            fixture_path = _string(fixture_data.get("path"), "fixtures.path", source, line_number)
+            if not FIXTURE_PATH_PATTERN.fullmatch(fixture_path) or ".." in fixture_path:
+                raise _error(source, line_number, "fixtures.path must be a relative JSON path")
+            if fixture_path in fixture_paths:
+                raise _error(source, line_number, "fixtures.path must not contain duplicates")
+            fixture_paths.add(fixture_path)
+            fixtures.append(
+                EvaluationFixture(
+                    path=fixture_path,
+                    purpose=_string(fixture_data.get("purpose"), "fixtures.purpose", source, line_number),
+                )
+            )
+
         return cls(
             id=identifier,
             suite=suite,
@@ -196,6 +226,7 @@ class EvaluationTask:
             ),
             guardrails=_string_tuple(raw.get("guardrails"), "guardrails", source, line_number),
             tracked_metrics=_string_tuple(raw.get("tracked_metrics"), "tracked_metrics", source, line_number),
+            fixtures=tuple(fixtures),
             source=source,
             line_number=line_number,
         )

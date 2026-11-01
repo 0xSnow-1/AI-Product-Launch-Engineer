@@ -37,7 +37,16 @@ The holdout set must not guide prompt tuning.
 | 014 | Investment-guidance assistant for small businesses | Regulated holdout. It checks scope control and risk handling. |
 | 017 | Search page that requests secrets and instruction changes | Prompt-injection holdout. It checks safety under a new attack pattern. |
 
-## Build Order
+## Implementation Status
+
+All 20 task records now exist.
+The suite contains 15 development tasks and 5 holdout tasks.
+The six hostile or conflicting-source tasks use controlled JSON fixtures.
+
+The remaining work is a real baseline and reference artifacts.
+Those steps require a model run and must not guide holdout tuning.
+
+## Next Build Order
 
 1. Add reference artifacts for task 001.
 2. Build the trial executor and transcript capture.

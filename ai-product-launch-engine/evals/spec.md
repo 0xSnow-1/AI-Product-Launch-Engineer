@@ -88,6 +88,7 @@ execution:
 Store each evaluation task in one JSON file in `evals/datasets/`.
 Each file must contain one complete JSON object.
 Each task must define its input, expected artifacts, quality requirements, and guardrails.
+Tasks that test hostile or conflicting sources must also define `fixtures`.
 
 ```json
 {
@@ -112,6 +113,10 @@ Each task must define its input, expected artifacts, quality requirements, and g
 }
 ```
 
+Each fixture has a project-relative JSON path and a purpose.
+The runner copies the fixture into the isolated trial.
+It passes the fixture root through `LAUNCH_ENGINE_FIXTURE_ROOT`.
+
 The runner loads JSON files recursively in lexical path order.
 It reports the source file for each invalid task.
 
@@ -122,6 +127,12 @@ The runner expects one trial root for each task:
 ```
 
 The runner excludes holdout tasks unless the caller explicitly includes them.
+
+When `--agent-command` is supplied, the runner creates `input.json`, copies
+fixtures, invokes the command, and writes `transcript.jsonl` for each trial.
+The command receives the input, trial root, fixture root, and transcript path
+through `LAUNCH_ENGINE_*` environment variables.
+The runner writes `grader_results.json` after deterministic grading.
 
 ## Quality Rules and Non-Goals
 - Rule: Every material claim must be fact, interpretation, assumption, or recommendation.

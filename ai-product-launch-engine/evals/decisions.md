@@ -34,11 +34,15 @@ The transcript will contain agent messages, tool calls, tool results, errors, to
 The grader results will explain each pass or failure.
 The summary will compare all trials in the run.
 
-## Current limit
+## Current execution boundary
 
-The current runner validates datasets and grades completed trial folders.
-It does not run the supervisor yet.
-The next runtime change must add trial execution and transcript capture.
+The runner validates datasets, creates an isolated trial, and grades the trial folder.
+It runs a real agent only when the caller supplies `--agent-command`.
+The runner does not select a provider or call a model by itself.
+
+The runner passes the input, workspace, fixtures, and transcript path through
+`LAUNCH_ENGINE_*` environment variables.
+The supervisor records model and tool callback events at the supplied transcript path.
 
 ## Quality scoring
 

@@ -1,3 +1,4 @@
-from agents.supervisor import PROMPT_DIR
+"""Current prompt versions for the launch-engine runtime."""
 
-print(PROMPT_DIR)
+SUPERVISOR_PROMPT_VERSION = "v2"
+SUBAGENT_PROMPT_VERSION = "v2"
