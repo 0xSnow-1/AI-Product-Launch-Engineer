@@ -1,0 +1,2 @@
+{"event": "tool_started", "run_id": "market-1", "tool": "task", "input": "{\"subagent_type\": \"market_researcher\"}", "timestamp": "2026-11-01T00:00:00Z"}
+{"event": "tool_started", "run_id": "broken", "tool": "task", "input": "{\"subagent_type\": \"customer_researcher\"}"

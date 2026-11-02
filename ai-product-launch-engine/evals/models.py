@@ -15,6 +15,8 @@ VALID_SUITES = frozenset({"capability", "regression"})
 REQUIRED_MANIFEST_AGENTS = frozenset(
     {"market_researcher", "customer_researcher", "gtm_strategist", "supervisor"}
 )
+DEFAULT_REQUIRED_SUBAGENTS = ("market_researcher", "customer_researcher", "gtm_strategist")
+DEFAULT_MAX_TOOL_CALLS = 60
 
 
 class DatasetValidationError(ValueError):
@@ -82,6 +84,8 @@ class TaskExpectation:
     artifacts: tuple[str, ...]
     required_sections: Mapping[str, tuple[str, ...]]
     min_sources: int
+    required_subagents: tuple[str, ...]
+    max_tool_calls: int
     manifest_agents: tuple[str, ...]
 
 
@@ -181,6 +185,17 @@ class EvaluationTask:
         if isinstance(min_sources, bool) or not isinstance(min_sources, int) or min_sources < 3:
             raise _error(source, line_number, "expected.min_sources must be an integer of at least 3")
 
+        required_subagents = _string_tuple(
+            expected_data.get("required_subagents", list(DEFAULT_REQUIRED_SUBAGENTS)),
+            "expected.required_subagents",
+            source,
+            line_number,
+        )
+
+        max_tool_calls = expected_data.get("max_tool_calls", DEFAULT_MAX_TOOL_CALLS)
+        if isinstance(max_tool_calls, bool) or not isinstance(max_tool_calls, int) or max_tool_calls <= 0:
+            raise _error(source, line_number, "expected.max_tool_calls must be a positive integer")
+
         manifest_agents = _string_tuple(
             expected_data.get("manifest_agents"),
             "expected.manifest_agents",
@@ -222,6 +237,8 @@ class EvaluationTask:
                 artifacts=artifacts,
                 required_sections=required_sections,
                 min_sources=min_sources,
+                required_subagents=required_subagents,
+                max_tool_calls=max_tool_calls,
                 manifest_agents=manifest_agents,
             ),
             guardrails=_string_tuple(raw.get("guardrails"), "guardrails", source, line_number),

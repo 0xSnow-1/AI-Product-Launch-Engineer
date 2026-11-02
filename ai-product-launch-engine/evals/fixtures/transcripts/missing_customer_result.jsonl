@@ -1,0 +1,5 @@
+{"event": "tool_started", "run_id": "market-1", "tool": "task", "input": "{\"subagent_type\": \"market_researcher\"}", "timestamp": "2026-11-01T00:00:00Z"}
+{"event": "tool_finished", "run_id": "market-1", "tool": "task", "output": "market research complete", "timestamp": "2026-11-01T00:00:05Z"}
+{"event": "tool_started", "run_id": "customer-1", "tool": "task", "input": "{\"subagent_type\": \"customer_researcher\"}", "timestamp": "2026-11-01T00:00:06Z"}
+{"event": "tool_started", "run_id": "gtm-1", "tool": "task", "input": "{\"subagent_type\": \"gtm_strategist\"}", "timestamp": "2026-11-01T00:00:10Z"}
+{"event": "tool_finished", "run_id": "gtm-1", "tool": "task", "output": "gtm strategy complete", "timestamp": "2026-11-01T00:00:20Z"}

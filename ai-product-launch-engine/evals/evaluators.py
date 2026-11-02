@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 import zipfile
 from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 from urllib.parse import urlparse
@@ -238,6 +240,229 @@ class ArchiveGrader:
         return _result(self.name, not missing_entries, {"missing_entries": missing_entries})
 
 
+def _parse_timestamp(value: Any) -> datetime | None:
+    """Parse an ISO 8601 timestamp and normalize it to UTC."""
+
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=UTC)
+    return parsed
+
+
+def _format_timestamp(value: datetime | None) -> str | None:
+    return value.isoformat() if value is not None else None
+
+
+def _parse_tool_input(value: Any) -> Mapping[str, Any] | None:
+    """Accept JSON input and Python dict string input."""
+
+    if isinstance(value, Mapping):
+        return value
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError:
+        try:
+            parsed = ast.literal_eval(value)
+        except (ValueError, SyntaxError):
+            return None
+    return parsed if isinstance(parsed, Mapping) else None
+
+
+class DelegationGrader:
+    """Prove the subagent path and the GTM dependency from the transcript."""
+
+    name = "delegation"
+    _RESEARCH_SUBAGENTS = ("market_researcher", "customer_researcher")
+    _GTM_SUBAGENT = "gtm_strategist"
+
+    @staticmethod
+    def _read_events(transcript_path: Path) -> tuple[list[tuple[int, Mapping[str, Any]]], list[dict[str, Any]]]:
+        events: list[tuple[int, Mapping[str, Any]]] = []
+        malformed: list[dict[str, Any]] = []
+        for line_number, line in enumerate(transcript_path.read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError as error:
+                malformed.append({"line": line_number, "error": error.msg})
+                continue
+            if not isinstance(event, Mapping):
+                malformed.append({"line": line_number, "error": "event must be a JSON object"})
+                continue
+            events.append((line_number, event))
+        return events, malformed
+
+    def grade(self, task: EvaluationTask, trial_root: Path) -> GradingResult:
+        required = tuple(task.expected.required_subagents)
+        details: dict[str, Any] = {
+            "required_subagents": list(required),
+            "max_tool_calls": task.expected.max_tool_calls,
+        }
+        transcript_path = trial_root / "transcript.jsonl"
+        if not transcript_path.is_file():
+            return _result(self.name, False, {**details, "error": "transcript.jsonl is missing"})
+        try:
+            events, malformed = self._read_events(transcript_path)
+        except (OSError, UnicodeDecodeError) as error:
+            return _result(self.name, False, {**details, "error": f"cannot read transcript: {error}"})
+        if malformed:
+            return _result(
+                self.name,
+                False,
+                {**details, "error": "malformed transcript line", "malformed_lines": malformed},
+            )
+
+        starts: dict[str, dict[str, Any]] = {}
+        finishes: dict[str, dict[str, Any]] = {}
+        missing_run_id_lines: list[int] = []
+        invalid_events: list[dict[str, Any]] = []
+        research_writes: list[dict[str, Any]] = []
+        tool_call_count = 0
+
+        for line_number, event in events:
+            kind = event.get("event")
+            if kind == "tool_started":
+                tool_call_count += 1
+                tool = event.get("tool")
+                if tool != "task":
+                    input_data = _parse_tool_input(event.get("input"))
+                    if input_data is not None:
+                        serialized_input = json.dumps(input_data, sort_keys=True)
+                        for path in ("research/market.md", "research/customers.md"):
+                            if path in serialized_input:
+                                research_writes.append({"line": line_number, "tool": tool, "path": path})
+
+            is_task_start = kind == "tool_started" and event.get("tool") == "task"
+            is_task_finish = kind == "tool_finished" and event.get("tool") == "task"
+            is_explicit_start = kind == "delegation_started"
+            is_explicit_finish = kind == "delegation_finished"
+            if not (is_task_start or is_task_finish or is_explicit_start or is_explicit_finish):
+                continue
+
+            run_id = event.get("run_id")
+            if run_id is None or not str(run_id).strip():
+                missing_run_id_lines.append(line_number)
+                continue
+            run_key = str(run_id)
+
+            if is_task_start or is_explicit_start:
+                subagent: Any = event.get("subagent")
+                if is_task_start:
+                    input_data = _parse_tool_input(event.get("input"))
+                    subagent = input_data.get("subagent_type") if input_data is not None else None
+                if not isinstance(subagent, str) or not subagent.strip():
+                    invalid_events.append({"line": line_number, "error": "subagent is missing"})
+                    continue
+                timestamp = _parse_timestamp(event.get("timestamp"))
+                if timestamp is None:
+                    invalid_events.append({"line": line_number, "error": "timestamp is missing or invalid"})
+                    continue
+                if run_key in starts:
+                    invalid_events.append({"line": line_number, "error": f"duplicate start for run_id {run_key}"})
+                    continue
+                starts[run_key] = {"subagent": subagent.strip(), "timestamp": timestamp, "line": line_number}
+                continue
+
+            timestamp = _parse_timestamp(event.get("timestamp"))
+            if timestamp is None:
+                invalid_events.append({"line": line_number, "error": "timestamp is missing or invalid"})
+                continue
+            if run_key in finishes:
+                invalid_events.append({"line": line_number, "error": f"duplicate finish for run_id {run_key}"})
+                continue
+            finishes[run_key] = {
+                "subagent": event.get("subagent"),
+                "timestamp": timestamp,
+                "line": line_number,
+            }
+
+        start_times: dict[str, datetime] = {}
+        finish_times: dict[str, datetime] = {}
+        errors: list[str] = []
+
+        for run_key, start in starts.items():
+            subagent = start["subagent"]
+            if subagent not in start_times or start["timestamp"] < start_times[subagent]:
+                start_times[subagent] = start["timestamp"]
+            finish = finishes.get(run_key)
+            if finish is None:
+                continue
+            finish_subagent = finish.get("subagent") or subagent
+            if finish_subagent != subagent:
+                errors.append(f"run_id {run_key} pairs {subagent} with {finish_subagent}")
+                continue
+            if finish_subagent not in finish_times or finish["timestamp"] < finish_times[finish_subagent]:
+                finish_times[finish_subagent] = finish["timestamp"]
+
+        unpaired_finish_lines = sorted(
+            finish["line"] for run_key, finish in finishes.items() if run_key not in starts
+        )
+        if unpaired_finish_lines:
+            errors.append("finish event without a matching start run_id")
+
+        if missing_run_id_lines:
+            errors.append("missing run_id; delegation dependency cannot be proven")
+        for invalid in invalid_events:
+            errors.append(f"invalid delegation event on line {invalid['line']}: {invalid['error']}")
+
+        delegated = sorted(start_times)
+        missing = sorted(set(required).difference(start_times))
+        if missing:
+            errors.append("missing subagents: " + ", ".join(missing))
+
+        market_finish = finish_times.get(self._RESEARCH_SUBAGENTS[0])
+        customer_finish = finish_times.get(self._RESEARCH_SUBAGENTS[1])
+        gtm_start = start_times.get(self._GTM_SUBAGENT)
+
+        for name, finish_time in zip(self._RESEARCH_SUBAGENTS, (market_finish, customer_finish)):
+            if name in required and finish_time is None:
+                errors.append(f"missing finish for {name}")
+
+        gtm_after_both_research = False
+        if gtm_start is None:
+            if self._GTM_SUBAGENT in required:
+                errors.append("gtm_strategist did not start")
+        elif market_finish is None or customer_finish is None:
+            errors.append("gtm dependency cannot be proven because a research finish is missing")
+        else:
+            if gtm_start < market_finish:
+                errors.append("gtm_strategist started before market_researcher finished")
+            if gtm_start < customer_finish:
+                errors.append("gtm_strategist started before customer_researcher finished")
+            gtm_after_both_research = gtm_start >= market_finish and gtm_start >= customer_finish
+
+        if tool_call_count > task.expected.max_tool_calls:
+            errors.append(
+                f"tool call count {tool_call_count} exceeds budget {task.expected.max_tool_calls}"
+            )
+
+        details.update(
+            {
+                "delegated_subagents": delegated,
+                "missing_subagents": missing,
+                "start_times": {name: _format_timestamp(start_times.get(name)) for name in required},
+                "finish_times": {name: _format_timestamp(finish_times.get(name)) for name in required},
+                "gtm_after_both_research": gtm_after_both_research,
+                "tool_call_count": tool_call_count,
+                "unfinished_subagents": sorted(set(start_times).difference(finish_times)),
+                "missing_run_id_lines": missing_run_id_lines,
+                "unpaired_finish_lines": unpaired_finish_lines,
+                "invalid_delegation_events": invalid_events,
+                "research_artifact_writes": research_writes,
+                "errors": errors,
+            }
+        )
+        return _result(self.name, not errors, details)
+
+
 class PlaceholderGrader:
     """Reject placeholders that make a completed artifact unusable."""
 
@@ -265,6 +490,7 @@ DEFAULT_GRADERS = (
     ManifestGrader(),
     ArchiveGrader(),
     PlaceholderGrader(),
+    DelegationGrader(),
 )
 
 
