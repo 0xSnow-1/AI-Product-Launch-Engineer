@@ -42,7 +42,7 @@ Each phase must leave the repository in a verified state.
 
 ## Phase 0: Contract and reference trial
 
-Status: not started
+Status: done (PR #12)
 
 ### Goal
 
@@ -114,7 +114,7 @@ Write the reference trial path, the test command, and the full grader result in 
 
 ## Phase 1: Delegation order and GTM dependency grader
 
-Status: not started
+Status: done (PR #13)
 
 ### Goal
 
