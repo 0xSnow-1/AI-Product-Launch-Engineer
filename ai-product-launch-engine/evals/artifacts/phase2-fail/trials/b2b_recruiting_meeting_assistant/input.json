@@ -1,0 +1,9 @@
+{
+  "idea": "An AI meeting assistant that records recruiter intake calls, extracts candidate requirements, creates structured notes, and sends follow-up actions to an applicant tracking system.",
+  "audience": "US recruiting agencies with 5 to 50 recruiters",
+  "constraints": {
+    "budget": "low",
+    "geography": "US",
+    "timeline": "Launch a paid pilot within 90 days"
+  }
+}
