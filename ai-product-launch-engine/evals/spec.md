@@ -175,6 +175,16 @@ All of the following must pass for an eval to be considered successful:
 - [ ] No artifacts written to deprecated `/workspace/research/` paths
 - [ ] Manifest is valid JSON
 - [ ] Each source entry has a non-empty title and a valid HTTP or HTTPS URL
+- [ ] All three subagents are delegated: `market_researcher`, `customer_researcher`, and `gtm_strategist`
+- [ ] `gtm_strategist` starts only after both research results are received
+- [ ] The tool-call count does not exceed the task budget
+
+The runner proves delegation from `transcript.jsonl`.
+It accepts two event shapes.
+The `task` tool shape records `tool_started` and `tool_finished` events with `tool` set to `task`.
+The explicit shape records `delegation_started` and `delegation_finished` events with a `subagent` field.
+Both shapes pair each start and finish by `run_id`.
+The GTM dependency uses timestamps, not list order.
 
 Source-content alignment requires live retrieval or model judgment.
 It is a scored check, not a deterministic hard gate.

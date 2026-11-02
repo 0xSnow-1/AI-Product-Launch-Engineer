@@ -1,0 +1,67 @@
+{"event": "delegation_started", "run_id": "market-1", "subagent": "market_researcher", "timestamp": "2026-11-01T00:00:00Z"}
+{"event": "delegation_finished", "run_id": "market-1", "subagent": "market_researcher", "status": "ok", "timestamp": "2026-11-01T00:00:05Z"}
+{"event": "delegation_started", "run_id": "customer-1", "subagent": "customer_researcher", "timestamp": "2026-11-01T00:00:06Z"}
+{"event": "delegation_finished", "run_id": "customer-1", "subagent": "customer_researcher", "status": "ok", "timestamp": "2026-11-01T00:00:10Z"}
+{"event": "delegation_started", "run_id": "gtm-1", "subagent": "gtm_strategist", "timestamp": "2026-11-01T00:00:11Z"}
+{"event": "delegation_finished", "run_id": "gtm-1", "subagent": "gtm_strategist", "status": "ok", "timestamp": "2026-11-01T00:00:20Z"}
+{"event": "tool_started", "run_id": "loop-01", "tool": "search", "input": "query 01", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-02", "tool": "search", "input": "query 02", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-03", "tool": "search", "input": "query 03", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-04", "tool": "search", "input": "query 04", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-05", "tool": "search", "input": "query 05", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-06", "tool": "search", "input": "query 06", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-07", "tool": "search", "input": "query 07", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-08", "tool": "search", "input": "query 08", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-09", "tool": "search", "input": "query 09", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-10", "tool": "search", "input": "query 10", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-11", "tool": "search", "input": "query 11", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-12", "tool": "search", "input": "query 12", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-13", "tool": "search", "input": "query 13", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-14", "tool": "search", "input": "query 14", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-15", "tool": "search", "input": "query 15", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-16", "tool": "search", "input": "query 16", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-17", "tool": "search", "input": "query 17", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-18", "tool": "search", "input": "query 18", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-19", "tool": "search", "input": "query 19", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-20", "tool": "search", "input": "query 20", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-21", "tool": "search", "input": "query 21", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-22", "tool": "search", "input": "query 22", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-23", "tool": "search", "input": "query 23", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-24", "tool": "search", "input": "query 24", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-25", "tool": "search", "input": "query 25", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-26", "tool": "search", "input": "query 26", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-27", "tool": "search", "input": "query 27", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-28", "tool": "search", "input": "query 28", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-29", "tool": "search", "input": "query 29", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-30", "tool": "search", "input": "query 30", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-31", "tool": "search", "input": "query 31", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-32", "tool": "search", "input": "query 32", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-33", "tool": "search", "input": "query 33", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-34", "tool": "search", "input": "query 34", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-35", "tool": "search", "input": "query 35", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-36", "tool": "search", "input": "query 36", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-37", "tool": "search", "input": "query 37", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-38", "tool": "search", "input": "query 38", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-39", "tool": "search", "input": "query 39", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-40", "tool": "search", "input": "query 40", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-41", "tool": "search", "input": "query 41", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-42", "tool": "search", "input": "query 42", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-43", "tool": "search", "input": "query 43", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-44", "tool": "search", "input": "query 44", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-45", "tool": "search", "input": "query 45", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-46", "tool": "search", "input": "query 46", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-47", "tool": "search", "input": "query 47", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-48", "tool": "search", "input": "query 48", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-49", "tool": "search", "input": "query 49", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-50", "tool": "search", "input": "query 50", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-51", "tool": "search", "input": "query 51", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-52", "tool": "search", "input": "query 52", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-53", "tool": "search", "input": "query 53", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-54", "tool": "search", "input": "query 54", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-55", "tool": "search", "input": "query 55", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-56", "tool": "search", "input": "query 56", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-57", "tool": "search", "input": "query 57", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-58", "tool": "search", "input": "query 58", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-59", "tool": "search", "input": "query 59", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-60", "tool": "search", "input": "query 60", "timestamp": "2026-11-01T00:00:30Z"}
+{"event": "tool_started", "run_id": "loop-61", "tool": "search", "input": "query 61", "timestamp": "2026-11-01T00:00:30Z"}

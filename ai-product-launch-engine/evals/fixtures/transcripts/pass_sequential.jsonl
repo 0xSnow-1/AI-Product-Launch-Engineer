@@ -1,0 +1,6 @@
+{"event": "delegation_started", "run_id": "market-1", "subagent": "market_researcher", "timestamp": "2026-11-01T00:00:00Z"}
+{"event": "delegation_finished", "run_id": "market-1", "subagent": "market_researcher", "status": "ok", "timestamp": "2026-11-01T00:00:05Z"}
+{"event": "delegation_started", "run_id": "customer-1", "subagent": "customer_researcher", "timestamp": "2026-11-01T00:00:06Z"}
+{"event": "delegation_finished", "run_id": "customer-1", "subagent": "customer_researcher", "status": "ok", "timestamp": "2026-11-01T00:00:10Z"}
+{"event": "delegation_started", "run_id": "gtm-1", "subagent": "gtm_strategist", "timestamp": "2026-11-01T00:00:11Z"}
+{"event": "delegation_finished", "run_id": "gtm-1", "subagent": "gtm_strategist", "status": "ok", "timestamp": "2026-11-01T00:00:20Z"}

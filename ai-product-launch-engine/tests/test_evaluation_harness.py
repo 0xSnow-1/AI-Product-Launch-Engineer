@@ -57,6 +57,55 @@ def _write_complete_trial(task, trial_root: Path) -> None:
             relative_path = virtual_path.removeprefix(f"/projects/{task.expected.project_slug}/")
             archive.write(project_root / relative_path, arcname=relative_path)
 
+    transcript = [
+        {
+            "event": "tool_started",
+            "run_id": "market-1",
+            "tool": "task",
+            "input": json.dumps({"subagent_type": "market_researcher"}),
+            "timestamp": "2026-11-01T00:00:00Z",
+        },
+        {
+            "event": "tool_started",
+            "run_id": "customer-1",
+            "tool": "task",
+            "input": json.dumps({"subagent_type": "customer_researcher"}),
+            "timestamp": "2026-11-01T00:00:01Z",
+        },
+        {
+            "event": "tool_finished",
+            "run_id": "market-1",
+            "tool": "task",
+            "output": "market research complete",
+            "timestamp": "2026-11-01T00:00:05Z",
+        },
+        {
+            "event": "tool_finished",
+            "run_id": "customer-1",
+            "tool": "task",
+            "output": "customer research complete",
+            "timestamp": "2026-11-01T00:00:06Z",
+        },
+        {
+            "event": "tool_started",
+            "run_id": "gtm-1",
+            "tool": "task",
+            "input": json.dumps({"subagent_type": "gtm_strategist"}),
+            "timestamp": "2026-11-01T00:00:10Z",
+        },
+        {
+            "event": "tool_finished",
+            "run_id": "gtm-1",
+            "tool": "task",
+            "output": "gtm strategy complete",
+            "timestamp": "2026-11-01T00:00:20Z",
+        },
+    ]
+    (trial_root / "transcript.jsonl").write_text(
+        "".join(f"{json.dumps(event)}\n" for event in transcript),
+        encoding="utf-8",
+    )
+
 
 class EvaluationHarnessTests(unittest.TestCase):
     def setUp(self) -> None:

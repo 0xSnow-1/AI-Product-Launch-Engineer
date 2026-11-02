@@ -79,6 +79,17 @@ workspace/evals/{run_id}/trials/{task_id}/projects/{project_slug}/
 `transcript.jsonl` contains process events, model events, and tool events.
 `grader_results.json` shows each deterministic gate.
 
+The `delegation` grader reads `transcript.jsonl`.
+It proves these checks:
+
+- `market_researcher`, `customer_researcher`, and `gtm_strategist` all ran.
+- `gtm_strategist` started after both research results arrived.
+- The tool-call count is within `expected.max_tool_calls`.
+
+The grader pairs each start and finish by `run_id`.
+It accepts the `task` tool events and the explicit delegation events.
+The result details show start times, finish times, missing agents, tool count, budget, and `gtm_after_both_research`.
+
 ## 5. Run the development suite
 
 This command runs the 15 non-holdout tasks.
