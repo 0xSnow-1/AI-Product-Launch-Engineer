@@ -70,6 +70,9 @@ execution:
   total_tokens: number
 ```
 
+Manifest execution metrics come from the trial transcript through `src/metrics.py`.
+The runner writes the manifest after the blueprint and before it builds `deliverable.zip`.
+
 ## Artifact Paths
 **Virtual Filesystem Scheme:**
 - Physical root: `ai-product-launch-engine/workspace`

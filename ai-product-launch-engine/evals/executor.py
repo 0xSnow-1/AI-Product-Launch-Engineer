@@ -76,6 +76,7 @@ def execute_task(
                 "idea": task.input.idea,
                 "audience": task.input.audience,
                 "constraints": dict(task.input.constraints),
+                "project_slug": task.expected.project_slug,
                 "fixtures": [
                     {"path": f"/fixtures/{fixture.path}", "purpose": fixture.purpose}
                     for fixture in task.fixtures

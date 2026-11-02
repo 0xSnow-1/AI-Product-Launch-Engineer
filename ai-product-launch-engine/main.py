@@ -29,6 +29,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         os.environ["WORKSPACE_ROOT"] = str(args.workspace_root)
 
     from agents.supervisor import create_blueprint, stream_response, supervisor
+    from src.config import Settings
+    from src.metrics import collect_metrics
+    from workflows.packaging import build_deliverable, write_manifest
     from src.schemas import LaunchRequest
     from src.transcript import JsonlCallbackHandler
 
@@ -60,8 +63,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         ]
     }
 
+    settings = Settings.from_environment(project_root=Path(__file__).resolve().parent)
+    workspace_root = args.workspace_root if args.workspace_root is not None else settings.workspace_root
+
     stream_response(supervisor, agent_input, {"callbacks": callbacks}, sys.stdout)
-    create_blueprint(supervisor, request.project_slug, sys.stdout)
+    create_blueprint(supervisor, request.project_slug, workspace_root, sys.stdout)
+
+    project_root = workspace_root / "projects" / request.project_slug
+    metrics = collect_metrics()
+    write_manifest(project_root, request.project_slug, list(metrics.get("agents_used") or []), metrics)
+    build_deliverable(project_root, request.project_slug)
     return 0
 
 
