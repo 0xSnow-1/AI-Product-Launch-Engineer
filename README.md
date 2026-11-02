@@ -119,8 +119,8 @@ See `.env.example` for the available variables.
 ### Run
 
 ```bash
-cd ai-product-launch-engine/src
-python -m agents.supervisor
+cd ai-product-launch-engine
+uv run python main.py --input <path-to-request.json>
 ```
 
 ## Current status

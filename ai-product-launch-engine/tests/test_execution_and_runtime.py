@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import io
+import os
 import sys
 import tempfile
 import unittest
@@ -12,10 +13,12 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
+os.environ.setdefault("TAVILY_API_KEY", "test-key")
 
 from evals.executor import execute_task
 from evals.task_loader import load_tasks
-from agents.supervisor import stream_response
+from agents.market_researcher import market_researcher
+from agents.supervisor import stream_response, supervisor
 from src.config import Settings
 from src.schemas import LaunchRequest
 
@@ -73,6 +76,15 @@ class RuntimeFoundationTests(unittest.TestCase):
     def test_settings_use_the_canonical_workspace_root(self) -> None:
         settings = Settings.from_environment({"WORKSPACE_ROOT": "custom-workspace"}, PROJECT_ROOT)
         self.assertEqual(settings.workspace_root, PROJECT_ROOT / "custom-workspace")
+
+    def test_settings_fall_back_to_the_trial_root(self) -> None:
+        settings = Settings.from_environment({"LAUNCH_ENGINE_TRIAL_ROOT": "/tmp/trial-root"}, PROJECT_ROOT)
+        self.assertEqual(settings.workspace_root, Path("/tmp/trial-root"))
+
+    def test_supervisor_is_built_at_module_scope(self) -> None:
+        self.assertEqual(type(supervisor).__name__, "CompiledStateGraph")
+        self.assertEqual(market_researcher["name"], "market_researcher")
+        self.assertNotIn("model", market_researcher)
 
     def test_launch_request_validates_and_generates_a_slug(self) -> None:
         request = LaunchRequest.from_mapping(

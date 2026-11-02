@@ -2,18 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Any
+from pathlib import Path
 
-from agents.common import load_prompt
+import yaml
+
+from agents.tools import search_tool
 
 
-def definition(model: Any, search_tool: Any) -> dict[str, Any]:
-    """Return the declarative subagent used by the supervisor."""
+PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "subagents" / "market_researcher" / "v2.yaml"
+SYSTEM_PROMPT = yaml.safe_load(PROMPT_PATH.read_text(encoding="utf-8"))["system_prompt"]
 
-    return {
-        "name": "market_researcher",
-        "description": "Research competitors, market opportunities, and cited evidence. Write market.md.",
-        "model": model,
-        "tools": [search_tool],
-        "system_prompt": load_prompt("subagents", "market_researcher", "v2.yaml"),
-    }
+market_researcher = {
+    "name": "market_researcher",
+    "description": "Research competitors, market opportunities, and cited evidence. Write market.md.",
+    "tools": [search_tool],
+    "system_prompt": SYSTEM_PROMPT,
+}
