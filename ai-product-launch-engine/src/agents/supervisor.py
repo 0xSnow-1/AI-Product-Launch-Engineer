@@ -1,52 +1,59 @@
-"""Supervisor factory and command-line entry point."""
+"""Supervisor agent for the AI Product Launch Engineer."""
 
 from __future__ import annotations
 
-import argparse
-import json
-import os
-import sys
 from pathlib import Path
-from typing import Any, Sequence, TextIO
+from typing import Any, TextIO
 
+import boto3
+import yaml
+from botocore.client import Config
+from deepagents import create_deep_agent
+from deepagents.backends import FilesystemBackend
 from dotenv import load_dotenv
+from langchain.agents.middleware import TodoListMiddleware
+from langchain_aws import ChatBedrockConverse
 
-from agents import customer_researcher, gtm_strategist, market_researcher
-from agents.common import create_backend, create_model, create_search_tool, load_prompt
+from agents.customer_researcher import customer_researcher
+from agents.gtm_strategist import gtm_strategist
+from agents.market_researcher import market_researcher
+from agents.tools import search_tool
 from src.config import Settings
-from src.schemas import LaunchRequest
-from src.transcript import JsonlCallbackHandler
 
 
-def build_supervisor(settings: Settings):
-    """Build the orchestrator with all three registered specialist agents."""
+load_dotenv()
 
-    from deepagents import create_deep_agent
-    from langchain.agents.middleware import TodoListMiddleware
+PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "supervisor" / "v2.yaml"
+SYSTEM_PROMPT = yaml.safe_load(PROMPT_PATH.read_text(encoding="utf-8"))["system_prompt"]
 
-    model = create_model(settings)
-    search_tool = create_search_tool()
-    subagents = [
-        market_researcher.definition(model, search_tool),
-        customer_researcher.definition(model, search_tool),
-        gtm_strategist.definition(model, search_tool),
-    ]
-    return create_deep_agent(
-        model=model,
-        backend=create_backend(settings),
-        system_prompt=load_prompt("supervisor", "v2.yaml"),
-        tools=[search_tool],
-        middleware=[TodoListMiddleware()],
-        subagents=subagents,
-        name="product_launch_supervisor",
-    )
+settings = Settings.from_environment(project_root=Path(__file__).resolve().parents[2])
+settings.workspace_root.mkdir(parents=True, exist_ok=True)
 
+bedrock_runtime_client = boto3.client(
+    "bedrock-runtime",
+    region_name=settings.bedrock_region,
+    config=Config(
+        read_timeout=300,
+        connect_timeout=60,
+        retries={"max_attempts": 3},
+    ),
+)
 
-def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Create an evidence-backed product launch blueprint.")
-    parser.add_argument("--input", type=Path, help="Path to a launch request JSON file.")
-    parser.add_argument("--workspace-root", type=Path, help="Physical root for this invocation's virtual filesystem.")
-    return parser
+model = ChatBedrockConverse(
+    model=settings.bedrock_model_id,
+    region_name=settings.bedrock_region,
+    client=bedrock_runtime_client,
+)
+
+supervisor = create_deep_agent(
+    model=model,
+    backend=FilesystemBackend(root_dir=settings.workspace_root, virtual_mode=True),
+    system_prompt=SYSTEM_PROMPT,
+    tools=[search_tool],
+    middleware=[TodoListMiddleware()],
+    subagents=[market_researcher, customer_researcher, gtm_strategist],
+    name="product_launch_supervisor",
+)
 
 
 def _chunk_text(message: Any) -> str:
@@ -88,23 +95,21 @@ def stream_response(agent: Any, agent_input: dict[str, object], config: dict[str
         print(file=output, flush=True)
     print("[progress] Run completed.", file=output, flush=True)
     print("\n=== SUPERVISOR SUMMARY ===", file=output, flush=True)
-    print(f"Project: {agent_input['messages'][0]['content']}", file=output, flush=True)
+    messages = agent_input.get("messages", [])
+    if isinstance(messages, list) and messages:
+        print(f"Project: {messages[0]['content']}", file=output, flush=True)
 
 
-def _create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
+def create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
     """Create the final blueprint.md artifact synthesizing market, customer, and GTM research."""
-
-    from pathlib import Path
 
     print("[progress] Creating blueprint.md from research artifacts...", file=output, flush=True)
 
     try:
-        # Read the research artifacts
         market_path = Path(f"/projects/{project_slug}/research/market.md")
         customers_path = Path(f"/projects/{project_slug}/research/customers.md")
         gtm_path = Path(f"/projects/{project_slug}/strategy/gtm.md")
 
-        # Read content if files exist
         artifacts = {}
         if market_path.exists():
             artifacts["market_research"] = market_path.read_text(encoding="utf-8")
@@ -113,12 +118,10 @@ def _create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
         if gtm_path.exists():
             artifacts["gtm_strategy"] = gtm_path.read_text(encoding="utf-8")
 
-        # Get truncated content for each artifact
         market_content = artifacts.get("market_research", "")[:1000] if artifacts.get("market_research") else ""
         customer_content = artifacts.get("customer_research", "")[:1000] if artifacts.get("customer_research") else ""
         gtm_content = artifacts.get("gtm_strategy", "")[:1000] if artifacts.get("gtm_strategy") else ""
 
-        # Create a comprehensive blueprint using list-based string construction
         blueprint_lines = [
             "# Product Launch Blueprint",
             "",
@@ -128,7 +131,7 @@ def _create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
             "## Executive Summary",
             "This blueprint synthesizes market research, customer insights, and go-to-market strategy to provide a comprehensive launch plan.",
             "",
-            "## Market Research"
+            "## Market Research",
         ]
 
         if market_content:
@@ -150,7 +153,10 @@ def _create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
         else:
             blueprint_lines.append("No GTM strategy available")
 
-        blueprint_lines.extend(["", "", "## Key Findings & Recommendations",
+        blueprint_lines.extend([
+            "",
+            "",
+            "## Key Findings & Recommendations",
             "Based on the synthesized research above, this blueprint provides:",
             "- Product positioning and messaging",
             "- Target audience identification",
@@ -168,73 +174,15 @@ def _create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
             "- Research is based on available data sources",
             "- Some findings may require additional validation",
             "- Market conditions may change during launch period",
-            ""])
+            "",
+        ])
 
-        blueprint_content = chr(10).join(blueprint_lines)
+        blueprint_content = "\n".join(blueprint_lines)
 
-        # Write blueprint.md
         blueprint_path = Path(f"/projects/{project_slug}/blueprint.md")
         blueprint_path.parent.mkdir(parents=True, exist_ok=True)
         blueprint_path.write_text(blueprint_content, encoding="utf-8")
 
         print(f"[progress] Blueprint created successfully at {blueprint_path}", file=output, flush=True)
-
-    except Exception as e:
-        print(f"[error] Failed to create blueprint.md: {e}", file=output, flush=True)
-
-
-def main(argv: Sequence[str] | None = None) -> int:
-    """Run one real launch request. This is the only path that invokes a model."""
-
-    load_dotenv()
-    args = _parser().parse_args(argv)
-    input_path = args.input or (Path(os.environ["LAUNCH_ENGINE_INPUT_PATH"]) if "LAUNCH_ENGINE_INPUT_PATH" in os.environ else None)
-    if input_path is None:
-        raise SystemExit("--input or LAUNCH_ENGINE_INPUT_PATH is required")
-    workspace_root = args.workspace_root or (
-        Path(os.environ["LAUNCH_ENGINE_TRIAL_ROOT"]) if "LAUNCH_ENGINE_TRIAL_ROOT" in os.environ else None
-    )
-    raw_request = json.loads(input_path.read_text(encoding="utf-8"))
-    request = LaunchRequest.from_mapping(raw_request)
-    settings = Settings.from_environment(project_root=Path(__file__).resolve().parents[2])
-    if workspace_root is not None:
-        settings = Settings(settings.bedrock_model_id, settings.bedrock_region, workspace_root)
-    callbacks = []
-    if "LAUNCH_ENGINE_TRANSCRIPT_PATH" in os.environ:
-        callbacks.append(JsonlCallbackHandler(Path(os.environ["LAUNCH_ENGINE_TRANSCRIPT_PATH"])))
-    agent_input = {
-        "messages": [
-            {
-                "role": "user",
-                "content": json.dumps(
-                    {
-                        "idea": request.idea,
-                        "audience": request.audience,
-                        "constraints": dict(request.constraints),
-                        "project_slug": request.project_slug,
-                        "controlled_fixtures": raw_request.get("fixtures", []),
-                    }
-                ),
-            }
-        ]
-    }
-    
-    # Build supervisor with dependency management and sequential execution
-    supervisor = build_supervisor(settings)
-    
-    # Stream response and create blueprint after completion
-    stream_response(
-        supervisor,
-        agent_input,
-        {"callbacks": callbacks},
-        sys.stdout,
-    )
-    
-    # Create blueprint after supervisor completes
-    _create_blueprint(supervisor, request.project_slug, sys.stdout)
-    
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+    except Exception as error:
+        print(f"[error] Failed to create blueprint.md: {error}", file=output, flush=True)

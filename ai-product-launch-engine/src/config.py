@@ -26,7 +26,11 @@ class Settings:
 
         values = os.environ if environment is None else environment
         root = project_root or Path(__file__).resolve().parents[1]
-        configured_workspace = Path(values.get("WORKSPACE_ROOT", "workspace"))
+        configured_workspace = Path(
+            values.get("WORKSPACE_ROOT")
+            or values.get("LAUNCH_ENGINE_TRIAL_ROOT")
+            or "workspace"
+        )
         workspace_root = configured_workspace if configured_workspace.is_absolute() else root / configured_workspace
         return cls(
             bedrock_model_id=values.get("BEDROCK_MODEL_ID", "anthropic.claude-haiku-4-5-20251001-v1:0"),
