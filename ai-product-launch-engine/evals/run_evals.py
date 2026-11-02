@@ -5,12 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import shlex
+import sys
 from pathlib import Path
 from typing import Sequence
 
 from evals.executor import execute_task
 from evals.evaluators import EvaluationReport, grade_trial
 from evals.models import DatasetValidationError, EvaluationTask
+from evals.report_html import build_report
 from evals.task_loader import load_tasks, select_tasks
 
 
@@ -31,6 +33,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--include-holdouts", action="store_true", help="Include holdout tasks in an unfiltered run.")
     parser.add_argument("--validate-only", action="store_true", help="Validate JSON task files without grading trial artifacts.")
     parser.add_argument("--report", type=Path, help="Write the JSON report to this path instead of standard output.")
+    parser.add_argument(
+        "--html",
+        action="store_true",
+        help="Write a self-contained report.html next to the JSON report.",
+    )
     parser.add_argument(
         "--agent-command",
         help="Run this command once per selected task before grading. The command receives LAUNCH_ENGINE_* paths in its environment.",
@@ -107,9 +114,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         "executions": execution_results,
     }
     report_path = args.report
-    if report_path is None and args.agent_command:
+    if report_path is None and (args.agent_command or args.html):
         report_path = args.trial_root.parent / "summary.json"
     _write_report(payload, report_path)
+    if args.html:
+        run_dir = report_path.parent if report_path is not None else args.trial_root.parent
+        try:
+            html_path = build_report(run_dir)
+        except Exception as error:
+            print(f"HTML report failed: {error}", file=sys.stderr)
+        else:
+            print(f"Report written to {html_path}")
     return 0 if payload["passed"] else 1
 
 
