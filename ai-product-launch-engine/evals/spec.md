@@ -197,6 +197,33 @@ It is a scored check, not a deterministic hard gate.
 | Assumption Transparency | 20% | Explicit labeling, impact assessment, validation method |
 | GTM Coherence | 10% | Positioning, messaging, distribution plan feasibility |
 
+## Report Format
+
+The runner writes `summary.json` for a run.
+Each trial writes `grader_results.json`.
+The model judge writes `judge_results.json` when it is enabled.
+The HTML report is `report.html`.
+
+`report.html` is self-contained.
+It uses inline CSS and minimal inline JavaScript.
+It loads no CDN, external font, external image, or network resource.
+It escapes untrusted text before the text enters the HTML.
+
+Generate the report from one run directory.
+
+```bash
+uv run python -m evals.report_html --run <run_dir>
+```
+
+The default output is `<run_dir>/report.html`.
+Use `--output <path>` to write the report to another path.
+The runner writes the report after grading when `--html` is set.
+
+The report reads `summary.json`, each trial `grader_results.json`, `judge_results.json` when present, `transcript.jsonl` when present, `input.json` when present, and the six project artifacts when present.
+It supports a single-task run and a multi-task run.
+It shows the overall status, KPI cards, task table, per-task detail, delegation timeline, GTM dependency badge, transcript timeline, and artifact previews.
+It shows a clear empty state when a file is missing.
+
 ## Failure Taxonomy
 Named failure types used when grading tasks:
 - Missing artifact

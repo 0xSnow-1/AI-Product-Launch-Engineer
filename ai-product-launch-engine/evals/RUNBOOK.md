@@ -63,6 +63,7 @@ uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
   --trial-root "workspace/evals/$run_id/trials" \
   --agent-command "uv run python main.py" \
+  --html \
   --report "workspace/evals/$run_id/summary.json"
 ```
 
@@ -70,6 +71,7 @@ Read these files after the run.
 
 ```text
 workspace/evals/{run_id}/summary.json
+workspace/evals/{run_id}/report.html
 workspace/evals/{run_id}/trials/{task_id}/input.json
 workspace/evals/{run_id}/trials/{task_id}/transcript.jsonl
 workspace/evals/{run_id}/trials/{task_id}/grader_results.json
@@ -90,7 +92,36 @@ The grader pairs each start and finish by `run_id`.
 It accepts the `task` tool events and the explicit delegation events.
 The result details show start times, finish times, missing agents, tool count, budget, and `gtm_after_both_research`.
 
-## 5. Run the development suite
+## 5. Render the HTML report
+
+The report is one self-contained file.
+It uses inline CSS and minimal inline JavaScript.
+It does not load a CDN, external font, external image, or network resource.
+
+Render the report for one completed task run.
+
+```bash
+uv run python -m evals.report_html --run "workspace/evals/<run_id>"
+```
+
+The default output is `workspace/evals/<run_id>/report.html`.
+Use `--output` to write the report to another path.
+
+```bash
+uv run python -m evals.report_html \
+  --run "workspace/evals/<run_id>" \
+  --output "workspace/evals/<run_id>/custom-report.html"
+```
+
+Render the report for a full suite run.
+Use the same command with the suite run directory.
+The report reads `summary.json` and every trial directory that it names.
+The runner can also write the report after grading with `--html`.
+
+The report shows the overall status, the KPI cards, the task table, the per-task detail, the delegation timeline, the GTM dependency badge, the transcript timeline, and the artifact previews.
+The report links to the raw JSON and transcript files.
+
+## 6. Run the development suite
 
 This command runs the 15 non-holdout tasks.
 
@@ -99,12 +130,13 @@ run_id="$(date +%Y%m%d-%H%M%S)"
 uv run python -m evals.run_evals \
   --trial-root "workspace/evals/$run_id/trials" \
   --agent-command "uv run python main.py" \
+  --html \
   --report "workspace/evals/$run_id/summary.json"
 ```
 
 Do not use holdouts while you change prompts.
 
-## 6. Run holdouts after tuning
+## 7. Run holdouts after tuning
 
 Use this only after the development suite is stable.
 
@@ -117,7 +149,7 @@ uv run python -m evals.run_evals \
   --report "workspace/evals/$run_id/summary.json"
 ```
 
-## 7. Add a task for a new bug
+## 8. Add a task for a new bug
 
 1. Add one JSON task in `evals/datasets/regression/`.
 2. Add a controlled fixture in `evals/fixtures/` when source content causes the bug.
