@@ -53,6 +53,12 @@
       ]
     },
     "min_sources": 3,
+    "required_subagents": [
+      "market_researcher",
+      "customer_researcher",
+      "gtm_strategist"
+    ],
+    "max_tool_calls": 60,
     "manifest_agents": [
       "market_researcher",
       "customer_researcher",

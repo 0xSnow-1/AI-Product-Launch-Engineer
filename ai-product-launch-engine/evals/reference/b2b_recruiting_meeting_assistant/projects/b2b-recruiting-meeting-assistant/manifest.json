@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "project_slug": "b2b-recruiting-meeting-assistant",
+    "created_at": "2026-11-02T00:00:00Z",
+    "version": "1.0.0"
+  },
+  "artifacts": [
+    "market.md",
+    "customers.md",
+    "gtm.md",
+    "blueprint.md",
+    "manifest.json"
+  ],
+  "execution": {
+    "agents_used": [
+      "market_researcher",
+      "customer_researcher",
+      "gtm_strategist",
+      "supervisor"
+    ],
+    "total_turns": 4,
+    "total_tool_calls": 12,
+    "total_tokens": 3200
+  }
+}
