@@ -37,7 +37,22 @@ uv run python -m unittest discover -s tests -v
 
 These commands do not call Bedrock or Tavily.
 
-## 3. Run one real agent trial
+## 3. Check the reference trial
+
+The reference trial proves that the task is solvable and that the graders work.
+Run this command before you change a grader.
+
+```bash
+uv run python -m unittest tests.test_reference_trial -v
+```
+
+The test copies `evals/reference/b2b_recruiting_meeting_assistant/` to a temporary directory.
+It builds `deliverable.zip` in that copy.
+It runs the seven artifact graders.
+Every grader must pass.
+The reference trial is not a model run.
+
+## 4. Run one real agent trial
 
 This command calls the model.
 It runs task 001 in an isolated workspace.
@@ -64,7 +79,7 @@ workspace/evals/{run_id}/trials/{task_id}/projects/{project_slug}/
 `transcript.jsonl` contains process events, model events, and tool events.
 `grader_results.json` shows each deterministic gate.
 
-## 4. Run the development suite
+## 5. Run the development suite
 
 This command runs the 15 non-holdout tasks.
 
@@ -78,7 +93,7 @@ uv run python -m evals.run_evals \
 
 Do not use holdouts while you change prompts.
 
-## 5. Run holdouts after tuning
+## 6. Run holdouts after tuning
 
 Use this only after the development suite is stable.
 
@@ -91,7 +106,7 @@ uv run python -m evals.run_evals \
   --report "workspace/evals/$run_id/summary.json"
 ```
 
-## 6. Add a task for a new bug
+## 7. Add a task for a new bug
 
 1. Add one JSON task in `evals/datasets/regression/`.
 2. Add a controlled fixture in `evals/fixtures/` when source content causes the bug.

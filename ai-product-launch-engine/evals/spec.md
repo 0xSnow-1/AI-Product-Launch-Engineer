@@ -11,7 +11,13 @@ constraints: object  # Optional project constraints
   - budget: string  # "low", "medium", "high"
   - geography: string  # Geographic scope
   - timeline: string  # Optional timeline constraints
+project_slug: string  # Runner-supplied slug (not a task input field)
 ```
+
+The runner supplies `project_slug` to the agent through `input.json`.
+The value must equal `expected.project_slug` for the task.
+The task author does not set `project_slug` in the `input` object.
+The agent must use the supplied slug for every artifact path.
 
 ## Output Schema
 The system produces a structured launch blueprint with the following artifacts:
@@ -106,12 +112,28 @@ Tasks that test hostile or conflicting sources must also define `fixtures`.
     "required_sections": {
       "/projects/project-slug/blueprint.md": ["Market Research"]
     },
-    "min_sources": 3
+    "min_sources": 3,
+    "required_subagents": [
+      "market_researcher",
+      "customer_researcher",
+      "gtm_strategist"
+    ],
+    "max_tool_calls": 60
   },
   "guardrails": ["Do not fabricate sources."],
   "tracked_metrics": ["latency_seconds"]
 }
 ```
+
+### Task expectation fields
+
+`expected.required_subagents` lists the subagents that must run.
+The default is `market_researcher`, `customer_researcher`, and `gtm_strategist`.
+The list must not be empty and must not contain duplicate names.
+
+`expected.max_tool_calls` is the tool-call budget for one trial.
+The default is `60`.
+The value must be a positive integer.
 
 Each fixture has a project-relative JSON path and a purpose.
 The runner copies the fixture into the isolated trial.
