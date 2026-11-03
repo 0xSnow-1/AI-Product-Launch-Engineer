@@ -167,22 +167,28 @@ class EvaluationHarnessTests(unittest.TestCase):
 
     def test_runner_grades_a_complete_isolated_trial(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
-            trial_collection = Path(temporary_directory)
-            _write_complete_trial(self.task, trial_collection / self.task.id)
+            root = Path(temporary_directory)
+            run_dir = root / "run"
+            trial_root = run_dir / "trials" / self.task.id
+            _write_complete_trial(self.task, trial_root)
             output = io.StringIO()
             with redirect_stdout(output):
                 exit_code = main(
                     [
                         "--datasets",
                         str(SEED_DATASET),
-                        "--trial-root",
-                        str(trial_collection),
+                        "--runs-root",
+                        str(root),
+                        "--run-id",
+                        "run",
                     ]
                 )
-            self.assertTrue((trial_collection / self.task.id / "grader_results.json").is_file())
-        report = json.loads(output.getvalue())
+            self.assertTrue((trial_root / "grader_results.json").is_file())
+            self.assertTrue((run_dir / "summary.json").is_file())
+            report = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
         self.assertEqual(exit_code, 0)
         self.assertTrue(report["passed"])
+        self.assertIn("Run directory:", output.getvalue())
 
 
 if __name__ == "__main__":

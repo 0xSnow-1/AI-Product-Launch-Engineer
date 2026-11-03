@@ -74,10 +74,26 @@ Manifest execution metrics come from the trial transcript through `src/metrics.p
 The runner writes the manifest after the blueprint and before it builds `deliverable.zip`.
 
 ## Artifact Paths
-**Virtual Filesystem Scheme:**
+
+The system uses two physical roots.
+The product root and the eval root must not overlap.
+
+**Product workspace:**
 - Physical root: `ai-product-launch-engine/workspace`
 - Virtual root: `/`
 - Project root: `/projects/{project_slug}/`
+
+The product workspace holds only `projects/`.
+A standalone run writes the six required files under `workspace/projects/{project_slug}/`.
+
+**Eval run root:**
+- Physical root for one trial: `ai-product-launch-engine/evals/runs/{run_id}/trials/{task_id}/`
+- Virtual root: `/`
+- Project root: `/projects/{project_slug}/`
+
+The eval runner writes every run under `evals/runs/`.
+The eval runner does not write to `workspace/`.
+Each trial writes only inside its own trial root.
 
 **Required artifacts:**
 ```
@@ -148,8 +164,12 @@ It reports the source file for each invalid task.
 The runner expects one trial root for each task:
 
 ```text
-{trial_root}/{task_id}/projects/{project_slug}/...
+evals/runs/{run_id}/trials/{task_id}/projects/{project_slug}/...
 ```
+
+The runner generates `{run_id}` when the caller does not supply one.
+The run id is a UTC timestamp, with a task or suite suffix.
+The runner refuses to reuse an existing run directory.
 
 The runner excludes holdout tasks unless the caller explicitly includes them.
 
@@ -202,10 +222,10 @@ It is a scored check, not a deterministic hard gate.
 
 ## Report Format
 
-The runner writes `summary.json` for a run.
+The runner writes `summary.json` for a run at `evals/runs/{run_id}/summary.json`.
 Each trial writes `grader_results.json`.
 The model judge writes `judge_results.json` when it is enabled.
-The HTML report is `report.html`.
+The HTML report is `evals/runs/{run_id}/report.html`.
 
 `report.html` is self-contained.
 It uses inline CSS and minimal inline JavaScript.

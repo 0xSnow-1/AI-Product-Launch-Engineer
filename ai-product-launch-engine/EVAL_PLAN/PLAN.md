@@ -18,7 +18,7 @@ Each phase must leave the repository in a verified state.
 - Do not tune prompts during Phase 4.
 - Do not run holdout tasks during prompt or prompt-adjacent work.
 - Add a regression task for every real bug.
-- Keep generated runs under `workspace/evals/`.
+- Keep generated runs under `evals/runs/`.
 - Do not commit `workspace/` output, `.env`, or secrets.
 - Record commands and evidence in the session handoff.
 - Update `evals/RUNBOOK.md` when a command or artifact path changes.
@@ -462,7 +462,7 @@ The baseline must exist before any prompt tuning.
   - State that holdout tasks are excluded.
 - [ ] Run task 001 twice with a distinct run ID.
   - Use `b2b_recruiting_meeting_assistant`.
-  - Use a new `--trial-root` for each run.
+  - Let the runner generate a new run id for each run.
   - Use `--agent-command "uv run python main.py"`.
   - Use `--html` to write the report.
   - Save `summary.json` inside each run directory.
@@ -487,7 +487,7 @@ The baseline must exist before any prompt tuning.
 
 ### Done when
 
-- [ ] Two run directories exist under `workspace/evals/`.
+- [ ] Two run directories exist under `evals/runs/`.
 - [ ] Each run has `summary.json`, `grader_results.json`, `transcript.jsonl`, `report.html`, and `projects/`.
 - [ ] The baseline record names both runs and the commit SHA.
 - [ ] The record reports per-grader results, not only an average.
