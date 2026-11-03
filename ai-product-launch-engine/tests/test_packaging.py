@@ -22,14 +22,14 @@ DATASET = PROJECT_ROOT / "evals" / "datasets" / "capability" / "b2b_recruiting_m
 REFERENCE_ROOT = PROJECT_ROOT / "evals" / "reference" / "b2b_recruiting_meeting_assistant"
 EXPECTED_ARCHIVE_ENTRIES = frozenset(
     {
-        "research/market.md",
-        "research/customers.md",
-        "strategy/gtm.md",
+        "research/market_research.json",
+        "research/customer_research.json",
+        "strategy/gtm_strategy.json",
         "blueprint.md",
         "manifest.json",
     }
 )
-EXPECTED_MANIFEST_ARTIFACTS = ("market.md", "customers.md", "gtm.md", "blueprint.md", "manifest.json")
+EXPECTED_MANIFEST_ARTIFACTS = ("market_research.json", "customer_research.json", "gtm_strategy.json", "blueprint.md", "manifest.json")
 EXPECTED_MANIFEST_AGENTS = ("market_researcher", "customer_researcher", "gtm_strategist", "supervisor")
 
 
@@ -73,12 +73,7 @@ class PackagingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             trial_root = Path(directory)
             project_root = trial_root / "projects" / self.task.expected.project_slug
-            project_root.mkdir(parents=True, exist_ok=True)
-            (project_root / "research").mkdir()
-            (project_root / "research" / "market.md").write_text("# Market Research\n", encoding="utf-8")
-            (project_root / "research" / "customers.md").write_text("# Customer Research\n", encoding="utf-8")
-            (project_root / "strategy").mkdir()
-            (project_root / "strategy" / "gtm.md").write_text("# GTM Strategy\n", encoding="utf-8")
+            shutil.copytree(REFERENCE_ROOT, trial_root, dirs_exist_ok=True)
 
             create_blueprint(object(), self.task.expected.project_slug, trial_root, io.StringIO())
             write_manifest(
@@ -90,9 +85,9 @@ class PackagingTests(unittest.TestCase):
             build_deliverable(project_root, self.task.expected.project_slug)
 
             expected_artifacts = (
-                "research/market.md",
-                "research/customers.md",
-                "strategy/gtm.md",
+                "research/market_research.json",
+                "research/customer_research.json",
+                "strategy/gtm_strategy.json",
                 "blueprint.md",
                 "manifest.json",
                 "deliverable.zip",

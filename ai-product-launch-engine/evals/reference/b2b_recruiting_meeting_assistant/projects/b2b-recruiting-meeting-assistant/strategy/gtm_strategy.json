@@ -1,0 +1,72 @@
+{
+  "project_id": "b2b-recruiting-meeting-assistant",
+  "generated_at": "2026-11-02T00:00:00Z",
+  "positioning": "For small US recruiting agencies that lose time on call notes, this assistant turns intake calls into structured candidate notes and ATS follow-up actions.",
+  "differentiation": "Recruiting-specific extraction plus structured ATS follow-up actions, instead of a raw transcript or generic summary.",
+  "target_segments": ["Small US recruiting agencies with 5 to 50 recruiters"],
+  "pricing_hypotheses": [
+    "Low monthly fee per recruiter",
+    "Paid pilot before annual commitment"
+  ],
+  "channels": [
+    "Direct outreach to agency owners in one region",
+    "LinkedIn demos of the note-to-ATS workflow",
+    "Partner ATS marketplaces",
+    "Webinars with a before and after intake call"
+  ],
+  "launch_roadmap": [
+    {
+      "name": "Pilot recruitment",
+      "timeline": "Weeks 1 to 2",
+      "activities": ["Recruit ten pilot agencies", "Confirm ATS access"],
+      "milestones": ["Ten signed pilot agreements"]
+    },
+    {
+      "name": "Pilot run",
+      "timeline": "Weeks 3 to 6",
+      "activities": ["Run the pilot", "Record time savings per recruiter"],
+      "milestones": ["Measured time saving per recruiter"]
+    },
+    {
+      "name": "Proof and pricing",
+      "timeline": "Weeks 7 to 8",
+      "activities": ["Publish case notes", "Publish a pricing page"],
+      "milestones": ["One reference customer"]
+    },
+    {
+      "name": "Expansion",
+      "timeline": "Weeks 9 to 12",
+      "activities": ["Expand outreach", "Open a self-serve trial"],
+      "milestones": ["Self-serve trial live"]
+    }
+  ],
+  "risks": [
+    "ATS integration access delays the pilot",
+    "Candidate data rules differ by state",
+    "Agencies hesitate to share call recordings"
+  ],
+  "assumptions": [
+    "Agencies will share call recordings with a clear data policy",
+    "ATS vendors allow write access through a supported interface"
+  ],
+  "claims": [
+    {
+      "id": "gtm-1",
+      "text": "Lead with ATS integration and data controls, not model quality alone.",
+      "kind": "recommendation",
+      "evidence_refs": []
+    },
+    {
+      "id": "gtm-2",
+      "text": "Ten paid pilot agencies within 90 days is an achievable launch goal.",
+      "kind": "assumption",
+      "evidence_refs": []
+    },
+    {
+      "id": "gtm-3",
+      "text": "The message leads with hours saved per recruiter each week.",
+      "kind": "recommendation",
+      "evidence_refs": []
+    }
+  ]
+}

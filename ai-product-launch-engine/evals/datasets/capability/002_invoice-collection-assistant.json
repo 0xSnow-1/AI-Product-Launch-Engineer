@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "invoice-collection-assistant",
     "artifacts": [
-      "/projects/invoice-collection-assistant/research/market.md",
-      "/projects/invoice-collection-assistant/research/customers.md",
-      "/projects/invoice-collection-assistant/strategy/gtm.md",
+      "/projects/invoice-collection-assistant/research/market_research.json",
+      "/projects/invoice-collection-assistant/research/customer_research.json",
+      "/projects/invoice-collection-assistant/strategy/gtm_strategy.json",
       "/projects/invoice-collection-assistant/blueprint.md",
       "/projects/invoice-collection-assistant/manifest.json",
       "/projects/invoice-collection-assistant/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/invoice-collection-assistant/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/invoice-collection-assistant/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/invoice-collection-assistant/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/invoice-collection-assistant/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,8 @@
       "customer_researcher",
       "gtm_strategist",
       "supervisor"
-    ]
+    ],
+    "max_tool_calls": 80
   },
   "guardrails": [
     "Use a credible, opened source for each material market statistic, competitor claim, pricing claim, and trend claim.",

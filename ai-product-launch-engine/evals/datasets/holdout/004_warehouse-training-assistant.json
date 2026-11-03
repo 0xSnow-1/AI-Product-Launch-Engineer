@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "warehouse-training-assistant",
     "artifacts": [
-      "/projects/warehouse-training-assistant/research/market.md",
-      "/projects/warehouse-training-assistant/research/customers.md",
-      "/projects/warehouse-training-assistant/strategy/gtm.md",
+      "/projects/warehouse-training-assistant/research/market_research.json",
+      "/projects/warehouse-training-assistant/research/customer_research.json",
+      "/projects/warehouse-training-assistant/strategy/gtm_strategy.json",
       "/projects/warehouse-training-assistant/blueprint.md",
       "/projects/warehouse-training-assistant/manifest.json",
       "/projects/warehouse-training-assistant/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/warehouse-training-assistant/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/warehouse-training-assistant/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/warehouse-training-assistant/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/warehouse-training-assistant/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,8 @@
       "customer_researcher",
       "gtm_strategist",
       "supervisor"
-    ]
+    ],
+    "max_tool_calls": 80
   },
   "guardrails": [
     "Use a credible, opened source for each material market statistic, competitor claim, pricing claim, and trend claim.",

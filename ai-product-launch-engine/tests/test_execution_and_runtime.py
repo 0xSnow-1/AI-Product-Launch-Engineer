@@ -100,15 +100,15 @@ class RuntimeFoundationTests(unittest.TestCase):
     def test_active_prompts_use_only_canonical_project_paths(self) -> None:
         prompt_root = PROJECT_ROOT / "src" / "prompts"
         active_prompts = [
-            prompt_root / "supervisor" / "v2.yaml",
-            prompt_root / "subagents" / "market_researcher" / "v2.yaml",
-            prompt_root / "subagents" / "customer_researcher" / "v2.yaml",
-            prompt_root / "subagents" / "gtm_strategist" / "v2.yaml",
+            prompt_root / "supervisor" / "v4.yaml",
+            prompt_root / "subagents" / "market_researcher" / "v3.yaml",
+            prompt_root / "subagents" / "customer_researcher" / "v3.yaml",
+            prompt_root / "subagents" / "gtm_strategist" / "v3.yaml",
         ]
         for prompt in active_prompts:
             content = prompt.read_text(encoding="utf-8")
             self.assertNotIn("/workspace/research/", content)
-        self.assertIn("/projects/{project_slug}/research/market.md", active_prompts[1].read_text(encoding="utf-8"))
+        self.assertIn("/projects/{project_slug}/research/market_research.json", active_prompts[1].read_text(encoding="utf-8"))
 
     def test_stream_response_prints_progress_and_model_text(self) -> None:
         class FakeAgent:

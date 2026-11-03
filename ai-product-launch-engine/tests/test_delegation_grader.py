@@ -30,12 +30,12 @@ class DelegationGraderTests(unittest.TestCase):
             shutil.copyfile(FIXTURES / fixture_name, trial_root / "transcript.jsonl")
             return self.grader.grade(self.task, trial_root)
 
-    def test_task_defaults_include_three_subagents_and_sixty_tool_calls(self) -> None:
+    def test_task_defaults_include_three_subagents_and_eighty_tool_calls(self) -> None:
         self.assertEqual(
             self.task.expected.required_subagents,
             ("market_researcher", "customer_researcher", "gtm_strategist"),
         )
-        self.assertEqual(self.task.expected.max_tool_calls, 60)
+        self.assertEqual(self.task.expected.max_tool_calls, 80)
 
     def test_parallel_research_passes(self) -> None:
         result = self._grade("pass_parallel.jsonl")

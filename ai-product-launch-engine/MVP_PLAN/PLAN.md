@@ -209,46 +209,46 @@ The eval suite must grade the same contract that the product uses.
 
 ### Things to implement
 
-- [ ] Add `tests/fixtures/launch_request.json`.
+- [x] Add `tests/fixtures/launch_request.json`.
   - One valid request for a CLI run.
-- [ ] Add prompt versions that write JSON.
+- [x] Add prompt versions that write JSON.
   - `src/prompts/subagents/market_researcher/v3.yaml`
   - `src/prompts/subagents/customer_researcher/v3.yaml`
   - `src/prompts/subagents/gtm_strategist/v3.yaml`
   - `src/prompts/supervisor/v4.yaml`
-- [ ] Make each specialist write the canonical path.
+- [x] Make each specialist write the canonical path.
   - `market_researcher` writes `research/market_research.json`.
   - `customer_researcher` writes `research/customer_research.json`.
   - `gtm_strategist` writes `strategy/gtm_strategy.json`.
-- [ ] Require source references in the JSON.
+- [x] Require source references in the JSON.
   - Each `fact` claim has at least one `EvidenceRef`.
   - Each `EvidenceRef` has a title and an HTTP or HTTPS URL.
   - This closes `F-003`.
-- [ ] Add `src/workflows/validation.py`.
+- [x] Add `src/workflows/validation.py`.
   - Load one artifact from the project root.
   - Parse it with the matching Pydantic model.
   - Return a typed result or a clear error.
-- [ ] Validate every specialist output before the supervisor accepts it.
+- [x] Validate every specialist output before the supervisor accepts it.
   - Reject a missing, malformed, or incomplete artifact.
   - Do not continue with partial data.
-- [ ] Add `src/metrics.py` fix.
+- [x] Add `src/metrics.py` fix.
   - Always include `supervisor` in `agents_used`.
   - This closes `F-005`.
-- [ ] Capture token usage from model callbacks.
+- [x] Capture token usage from model callbacks.
   - Write a structured `usage` field in the transcript event.
   - This closes `O-001`.
-- [ ] Set a realistic tool budget.
+- [x] Set a realistic tool budget.
   - Raise `max_tool_calls` to 80, or reduce repeated reads.
   - Record the decision in `Failures.md`.
   - This closes `F-006`.
-- [ ] Update the eval suite to JSON.
+- [x] Update the eval suite to JSON.
   - `evals/spec.md`: artifact paths and JSON fields.
   - `evals/datasets/**/*.json`: expected artifacts.
   - `evals/evaluators.py`: replace heading checks with schema checks.
   - `evals/reference/b2b_recruiting_meeting_assistant/`: JSON reference trial.
   - `tests/test_reference_trial.py`.
   - This closes `F-004`.
-- [ ] Add `tests/test_validation.py`.
+- [x] Add `tests/test_validation.py`.
   - Valid JSON passes.
   - Missing field fails.
   - A `fact` claim without evidence fails.
@@ -275,12 +275,12 @@ Both parts must merge before Phase 2 starts.
 
 ### Done when
 
-- [ ] One CLI run writes three valid JSON artifacts.
-- [ ] `uv run python -m unittest discover -s tests` passes.
-- [ ] `uv run python -m evals.run_evals --validate-only --include-holdouts` returns `"valid": true`.
-- [ ] The reference trial passes every grader.
-- [ ] `F-003`, `F-004`, `F-005`, `F-006`, and `O-001` are closed or reclassified.
-- [ ] A malformed artifact stops the run with a clear error.
+- [ ] One CLI run writes three valid JSON artifacts. (Blocked: Bedrock returns AccessDeniedException on 2026-11-04. See Failures.md.)
+- [x] `uv run python -m unittest discover -s tests` passes.
+- [x] `uv run python -m evals.run_evals --validate-only --include-holdouts` returns `"valid": true`.
+- [x] The reference trial passes every grader.
+- [x] `F-003`, `F-004`, `F-005`, `F-006`, and `O-001` are closed or reclassified.
+- [ ] A malformed artifact stops the run with a clear error. (Enforced in main.py and src/workflows/validation.py; covered by tests/test_validation.py. End-to-end run blocked by Bedrock access.)
 
 ### Out of scope
 

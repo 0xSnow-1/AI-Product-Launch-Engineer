@@ -79,6 +79,15 @@ def _token_count(event: Mapping[str, Any]) -> int | None:
         value = usage.get("total_tokens")
         if isinstance(value, int) and not isinstance(value, bool):
             return value
+        input_tokens = usage.get("input_tokens")
+        output_tokens = usage.get("output_tokens")
+        if (
+            isinstance(input_tokens, int)
+            and not isinstance(input_tokens, bool)
+            and isinstance(output_tokens, int)
+            and not isinstance(output_tokens, bool)
+        ):
+            return input_tokens + output_tokens
     return None
 
 
@@ -105,6 +114,7 @@ def collect_metrics(transcript_path: Path | None = None) -> dict[str, Any]:
     tokens = 0
     tokens_seen = False
 
+    events_seen = False
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -114,6 +124,7 @@ def collect_metrics(transcript_path: Path | None = None) -> dict[str, Any]:
             continue
         if not isinstance(event, Mapping):
             continue
+        events_seen = True
         event_type = event.get("event")
         if event_type == "model_started":
             turns += 1
@@ -128,7 +139,7 @@ def collect_metrics(transcript_path: Path | None = None) -> dict[str, Any]:
             tokens += token_count
             tokens_seen = True
 
-    metrics["agents_used"] = agents
+    metrics["agents_used"] = (["supervisor", *agents] if events_seen else agents)
     metrics["total_turns"] = turns
     metrics["total_tool_calls"] = tool_calls
     metrics["total_tokens"] = tokens if tokens_seen else 0

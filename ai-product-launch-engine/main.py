@@ -34,6 +34,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     from workflows.packaging import build_deliverable, write_manifest
     from src.schemas import LaunchRequest
     from src.transcript import JsonlCallbackHandler
+    from src.workflows.validation import ArtifactValidationError, validate_project
 
     input_path = args.input or (
         Path(os.environ["LAUNCH_ENGINE_INPUT_PATH"]) if "LAUNCH_ENGINE_INPUT_PATH" in os.environ else None
@@ -65,11 +66,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     settings = Settings.from_environment(project_root=Path(__file__).resolve().parent)
     workspace_root = args.workspace_root if args.workspace_root is not None else settings.workspace_root
+    project_root = workspace_root / "projects" / request.project_slug
 
     stream_response(supervisor, agent_input, {"callbacks": callbacks}, sys.stdout)
+
+    try:
+        validate_project(project_root)
+    except ArtifactValidationError as error:
+        raise SystemExit(f"artifact validation failed: {error}") from error
     create_blueprint(supervisor, request.project_slug, workspace_root, sys.stdout)
 
-    project_root = workspace_root / "projects" / request.project_slug
     metrics = collect_metrics()
     write_manifest(project_root, request.project_slug, list(metrics.get("agents_used") or []), metrics)
     build_deliverable(project_root, request.project_slug)

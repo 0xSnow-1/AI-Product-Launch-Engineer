@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "investment-guidance-small-business",
     "artifacts": [
-      "/projects/investment-guidance-small-business/research/market.md",
-      "/projects/investment-guidance-small-business/research/customers.md",
-      "/projects/investment-guidance-small-business/strategy/gtm.md",
+      "/projects/investment-guidance-small-business/research/market_research.json",
+      "/projects/investment-guidance-small-business/research/customer_research.json",
+      "/projects/investment-guidance-small-business/strategy/gtm_strategy.json",
       "/projects/investment-guidance-small-business/blueprint.md",
       "/projects/investment-guidance-small-business/manifest.json",
       "/projects/investment-guidance-small-business/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/investment-guidance-small-business/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/investment-guidance-small-business/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/investment-guidance-small-business/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/investment-guidance-small-business/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,8 @@
       "customer_researcher",
       "gtm_strategist",
       "supervisor"
-    ]
+    ],
+    "max_tool_calls": 80
   },
   "guardrails": [
     "Use a credible, opened source for each material market statistic, competitor claim, pricing claim, and trend claim.",

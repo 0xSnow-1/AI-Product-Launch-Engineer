@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "field-service-dispatch-assistant",
     "artifacts": [
-      "/projects/field-service-dispatch-assistant/research/market.md",
-      "/projects/field-service-dispatch-assistant/research/customers.md",
-      "/projects/field-service-dispatch-assistant/strategy/gtm.md",
+      "/projects/field-service-dispatch-assistant/research/market_research.json",
+      "/projects/field-service-dispatch-assistant/research/customer_research.json",
+      "/projects/field-service-dispatch-assistant/strategy/gtm_strategy.json",
       "/projects/field-service-dispatch-assistant/blueprint.md",
       "/projects/field-service-dispatch-assistant/manifest.json",
       "/projects/field-service-dispatch-assistant/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/field-service-dispatch-assistant/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/field-service-dispatch-assistant/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/field-service-dispatch-assistant/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/field-service-dispatch-assistant/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,8 @@
       "customer_researcher",
       "gtm_strategist",
       "supervisor"
-    ]
+    ],
+    "max_tool_calls": 80
   },
   "guardrails": [
     "Use a credible, opened source for each material market statistic, competitor claim, pricing claim, and trend claim.",

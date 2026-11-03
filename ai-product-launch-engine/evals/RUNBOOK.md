@@ -77,6 +77,25 @@ evals/runs/{run_id}/trials/{task_id}/grader_results.json
 evals/runs/{run_id}/trials/{task_id}/projects/{project_slug}/
 ```
 
+The project directory holds six files.
+
+```text
+projects/{project_slug}/
+├── research/
+│   ├── market_research.json
+│   └── customer_research.json
+├── strategy/
+│   └── gtm_strategy.json
+├── blueprint.md
+├── manifest.json
+└── deliverable.zip
+```
+
+The three JSON artifacts are validated against `src/contracts.py`.
+The `artifact_schemas` grader parses each file and reports the contract errors for each missing, malformed, or incomplete artifact.
+The `source_citations` grader counts unique titled HTTP or HTTPS evidence references across the JSON artifacts.
+The `section_coverage` grader checks the Markdown headings in `blueprint.md` only.
+
 The run writes only under `evals/runs/`.
 The product workspace stays at `workspace/projects/{project_slug}/`.
 

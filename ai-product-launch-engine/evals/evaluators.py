@@ -13,10 +13,16 @@ from typing import Any, Iterable, Mapping
 from urllib.parse import urlparse
 
 from evals.models import EvaluationTask
+from src.workflows.validation import ArtifactKind, ArtifactValidationError, load_artifact
 
 
 PLACEHOLDER_PATTERN = re.compile(r"\bTODO\b|\blorem ipsum\b|\[citation needed\]", re.IGNORECASE)
-SOURCE_PATTERN = re.compile(r"^\s*[-*]\s+\[([^\]]*)]\(([^\s)]+)\)\s*$", re.MULTILINE)
+
+SCHEMA_ARTIFACT_KINDS: dict[str, ArtifactKind] = {
+    "research/market_research.json": "market_research",
+    "research/customer_research.json": "customer_research",
+    "strategy/gtm_strategy.json": "gtm_strategy",
+}
 
 
 @dataclass(frozen=True)
@@ -97,6 +103,30 @@ class DeprecatedPathGrader:
         )
 
 
+class ArtifactSchemaGrader:
+    """Validate the specialist JSON artifacts against the product contracts."""
+
+    name = "artifact_schemas"
+
+    def grade(self, task: EvaluationTask, trial_root: Path) -> GradingResult:
+        slug = task.expected.project_slug
+        project_root = _physical_path(trial_root, f"/projects/{slug}")
+        expected_relatives = {
+            virtual_path.removeprefix(f"/projects/{slug}/")
+            for virtual_path in task.expected.artifacts
+            if virtual_path.startswith(f"/projects/{slug}/")
+        }
+        errors: dict[str, str] = {}
+        for relative, kind in SCHEMA_ARTIFACT_KINDS.items():
+            if relative not in expected_relatives:
+                continue
+            try:
+                load_artifact(project_root, kind)
+            except ArtifactValidationError as error:
+                errors[relative] = str(error)
+        return _result(self.name, not errors, {"schema_errors": errors})
+
+
 class SectionCoverageGrader:
     """Require exact Markdown headings defined by the task."""
 
@@ -121,6 +151,19 @@ class SectionCoverageGrader:
         return _result(self.name, not missing, {"missing_sections": missing})
 
 
+def _iter_evidence_refs(node: Any) -> Iterable[Mapping[str, Any]]:
+    """Yield every evidence-ref-shaped object inside a parsed JSON artifact."""
+
+    if isinstance(node, Mapping):
+        if isinstance(node.get("title"), str) and isinstance(node.get("url"), str):
+            yield node
+        for value in node.values():
+            yield from _iter_evidence_refs(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _iter_evidence_refs(item)
+
+
 class SourceCitationGrader:
     """Require a task-defined minimum of titled HTTP or HTTPS citations."""
 
@@ -135,15 +178,21 @@ class SourceCitationGrader:
         citations: list[tuple[str, str]] = []
         invalid_urls: list[str] = []
         for virtual_path in task.expected.artifacts:
-            if not virtual_path.endswith(".md"):
+            if not virtual_path.endswith(".json") or virtual_path.endswith("manifest.json"):
                 continue
             physical_path = _physical_path(trial_root, virtual_path)
             if not physical_path.is_file():
                 continue
-            content = physical_path.read_text(encoding="utf-8")
-            for title, url in SOURCE_PATTERN.findall(content):
-                if title.strip() and self._valid_url(url):
-                    citations.append((title.strip(), url))
+            try:
+                parsed = json.loads(physical_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                invalid_urls.append(f"{virtual_path}: unreadable JSON")
+                continue
+            for ref in _iter_evidence_refs(parsed):
+                title = str(ref["title"]).strip()
+                url = str(ref["url"]).strip()
+                if title and self._valid_url(url):
+                    citations.append((title, url))
                 else:
                     invalid_urls.append(url)
         unique_citations = {(title, url) for title, url in citations}
@@ -336,7 +385,7 @@ class DelegationGrader:
                     input_data = _parse_tool_input(event.get("input"))
                     if input_data is not None:
                         serialized_input = json.dumps(input_data, sort_keys=True)
-                        for path in ("research/market.md", "research/customers.md"):
+                        for path in ("research/market_research.json", "research/customer_research.json"):
                             if path in serialized_input:
                                 research_writes.append({"line": line_number, "tool": tool, "path": path})
 
@@ -471,7 +520,9 @@ class PlaceholderGrader:
     def grade(self, task: EvaluationTask, trial_root: Path) -> GradingResult:
         matches: dict[str, list[str]] = {}
         for virtual_path in task.expected.artifacts:
-            if not virtual_path.endswith(".md"):
+            if not (virtual_path.endswith(".md") or virtual_path.endswith(".json")):
+                continue
+            if virtual_path.endswith("manifest.json"):
                 continue
             physical_path = _physical_path(trial_root, virtual_path)
             if not physical_path.is_file():
@@ -485,6 +536,7 @@ class PlaceholderGrader:
 DEFAULT_GRADERS = (
     ArtifactExistsGrader(),
     DeprecatedPathGrader(),
+    ArtifactSchemaGrader(),
     SectionCoverageGrader(),
     SourceCitationGrader(),
     ManifestGrader(),

@@ -3,6 +3,6 @@
 {"event": "tool_started", "run_id": "search-1", "parent_run_id": "market-1", "tool": "tavily_search", "input": "recruiting software market", "timestamp": "2026-11-01T00:00:02Z"}
 {"event": "tool_finished", "run_id": "market-1", "tool": "task", "output": "market research complete", "timestamp": "2026-11-01T00:00:10Z"}
 {"event": "tool_finished", "run_id": "customer-1", "tool": "task", "output": "customer research complete", "timestamp": "2026-11-01T00:00:11Z"}
-{"event": "tool_started", "run_id": "write-1", "parent_run_id": "supervisor-1", "tool": "write_file", "input": "{\"path\": \"projects/b2b-recruiting-meeting-assistant/research/market.md\"}", "timestamp": "2026-11-01T00:00:12Z"}
+{"event": "tool_started", "run_id": "write-1", "parent_run_id": "supervisor-1", "tool": "write_file", "input": "{\"path\": \"projects/b2b-recruiting-meeting-assistant/research/market_research.json\"}", "timestamp": "2026-11-01T00:00:12Z"}
 {"event": "tool_started", "run_id": "gtm-1", "parent_run_id": "supervisor-1", "tool": "task", "input": "{\"description\": \"gtm strategy\", \"subagent_type\": \"gtm_strategist\"}", "timestamp": "2026-11-01T00:00:13Z"}
 {"event": "tool_finished", "run_id": "gtm-1", "tool": "task", "output": "gtm strategy complete", "timestamp": "2026-11-01T00:00:20Z"}

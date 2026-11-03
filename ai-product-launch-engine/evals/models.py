@@ -16,7 +16,7 @@ REQUIRED_MANIFEST_AGENTS = frozenset(
     {"market_researcher", "customer_researcher", "gtm_strategist", "supervisor"}
 )
 DEFAULT_REQUIRED_SUBAGENTS = ("market_researcher", "customer_researcher", "gtm_strategist")
-DEFAULT_MAX_TOOL_CALLS = 60
+DEFAULT_MAX_TOOL_CALLS = 80
 
 
 class DatasetValidationError(ValueError):
@@ -33,9 +33,9 @@ def required_artifact_paths(project_slug: str) -> tuple[str, ...]:
 
     root = f"/projects/{project_slug}"
     return (
-        f"{root}/research/market.md",
-        f"{root}/research/customers.md",
-        f"{root}/strategy/gtm.md",
+        f"{root}/research/market_research.json",
+        f"{root}/research/customer_research.json",
+        f"{root}/strategy/gtm_strategy.json",
         f"{root}/blueprint.md",
         f"{root}/manifest.json",
         f"{root}/deliverable.zip",

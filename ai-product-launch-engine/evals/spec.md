@@ -23,12 +23,18 @@ The agent must use the supplied slug for every artifact path.
 The system produces a structured launch blueprint with the following artifacts:
 
 ### Required Files
-- `/projects/{project_slug}/research/market.md`
-- `/projects/{project_slug}/research/customers.md`
-- `/projects/{project_slug}/strategy/gtm.md`
+- `/projects/{project_slug}/research/market_research.json`
+- `/projects/{project_slug}/research/customer_research.json`
+- `/projects/{project_slug}/strategy/gtm_strategy.json`
 - `/projects/{project_slug}/blueprint.md`
 - `/projects/{project_slug}/manifest.json`
 - `/projects/{project_slug}/deliverable.zip`
+
+The three specialist artifacts are validated JSON.
+`market_research.json` must parse as `MarketResearch` in `src/contracts.py`.
+`customer_research.json` must parse as `CustomerResearch`.
+`gtm_strategy.json` must parse as `GTMStrategy`.
+Each `fact` claim must carry at least one `EvidenceRef` with a title and an HTTP or HTTPS URL.
 
 ### Blueprint.md Structure
 ```yaml
@@ -59,9 +65,9 @@ metadata:
   created_at: timestamp
   version: string
 artifacts:
-  - market.md
-  - customers.md
-  - gtm.md
+  - market_research.json
+  - customer_research.json
+  - gtm_strategy.json
   - blueprint.md
 execution:
   agents_used: ["market_researcher", "customer_researcher", "gtm_strategist", "supervisor"]
@@ -99,10 +105,10 @@ Each trial writes only inside its own trial root.
 ```
 /projects/{project_slug}/
 ├── research/
-│   ├── market.md
-│   └── customers.md
+│   ├── market_research.json
+│   └── customer_research.json
 ├── strategy/
-│   └── gtm.md
+│   └── gtm_strategy.json
 ├── blueprint.md
 ├── manifest.json
 └── deliverable.zip
@@ -127,7 +133,14 @@ Tasks that test hostile or conflicting sources must also define `fixtures`.
   },
   "expected": {
     "project_slug": "project-slug",
-    "artifacts": ["/projects/project-slug/blueprint.md"],
+    "artifacts": [
+      "/projects/project-slug/research/market_research.json",
+      "/projects/project-slug/research/customer_research.json",
+      "/projects/project-slug/strategy/gtm_strategy.json",
+      "/projects/project-slug/blueprint.md",
+      "/projects/project-slug/manifest.json",
+      "/projects/project-slug/deliverable.zip"
+    ],
     "required_sections": {
       "/projects/project-slug/blueprint.md": ["Market Research"]
     },
@@ -137,12 +150,16 @@ Tasks that test hostile or conflicting sources must also define `fixtures`.
       "customer_researcher",
       "gtm_strategist"
     ],
-    "max_tool_calls": 60
+    "max_tool_calls": 80
   },
   "guardrails": ["Do not fabricate sources."],
   "tracked_metrics": ["latency_seconds"]
 }
 ```
+
+`expected.required_sections` lists exact Markdown headings required for Markdown artifacts.
+It must reference expected `.md` artifact paths.
+The specialist JSON artifacts are graded by schema checks against `src/contracts.py`, not by heading checks.
 
 ### Task expectation fields
 
@@ -151,7 +168,7 @@ The default is `market_researcher`, `customer_researcher`, and `gtm_strategist`.
 The list must not be empty and must not contain duplicate names.
 
 `expected.max_tool_calls` is the tool-call budget for one trial.
-The default is `60`.
+The default is `80`.
 The value must be a positive integer.
 
 Each fixture has a project-relative JSON path and a purpose.
@@ -195,6 +212,7 @@ All of the following must pass for an eval to be considered successful:
 - [ ] Required artifacts exist at correct virtual paths
 - [ ] Blueprint contains all required sections (market, customer, GTM)
 - [ ] At least 3 sources with valid URLs are cited
+- [ ] The three specialist JSON artifacts validate against the contracts
 - [ ] No artifacts written to deprecated `/workspace/research/` paths
 - [ ] Manifest is valid JSON
 - [ ] Each source entry has a non-empty title and a valid HTTP or HTTPS URL

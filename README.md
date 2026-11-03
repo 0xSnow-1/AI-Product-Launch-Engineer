@@ -135,9 +135,13 @@ workspace. There is no Slack interface yet.
 
 The command-line launch engine works end to end.
 The supervisor plans with `TodoListMiddleware`, delegates to `market_researcher`,
-`customer_researcher`, and `gtm_strategist`, and assembles a Markdown launch
-blueprint packaged as a zip with a manifest.
-The eval harness runs 20 tasks against 8 deterministic graders.
+`customer_researcher`, and `gtm_strategist`.
+Each specialist writes one validated JSON artifact: `research/market_research.json`,
+`research/customer_research.json`, and `strategy/gtm_strategy.json`.
+The CLI validates the three artifacts against `src/contracts.py` before it builds
+the blueprint, the manifest, and the zip.
+The eval harness runs 20 tasks against 9 deterministic graders with schema checks
+for the JSON artifacts.
 The unit suite passes and CI runs the tests and task validation on every pull request.
 
 The MVP scope, plan, and per-phase checks live in [MVP.md](MVP.md) and
@@ -146,15 +150,15 @@ Per-phase verification commands are in
 [MVP_PLAN/verification.md](ai-product-launch-engine/MVP_PLAN/verification.md).
 The MVP data contracts are frozen in
 [ai-product-launch-engine/src/contracts.py](ai-product-launch-engine/src/contracts.py).
-They are not wired into the agent pipeline yet.
-Slack delivery, JSON artifact outputs, async research, persistence, and deployment
-are planned future phases.
+They are wired into the specialist output path.
+Slack delivery, the async research workflow, and persistence are planned future
+phases.
 
 ## Roadmap
 
 The phase order is defined in
 [ai-product-launch-engine/MVP_PLAN/PLAN.md](ai-product-launch-engine/MVP_PLAN/PLAN.md).
 Phase 0 freezes the data contracts.
-Phases 1 to 6 add structured JSON artifacts, the async research workflow, the
+Phase 1 adds structured JSON artifacts. Phases 2 to 6 add the async research workflow, the
 decision step and GTM guard, Slack integration, persistence, and deployment.
 The Design Agent is deferred to a later plan.
