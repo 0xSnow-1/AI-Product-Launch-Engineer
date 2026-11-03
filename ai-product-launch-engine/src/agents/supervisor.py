@@ -100,89 +100,87 @@ def stream_response(agent: Any, agent_input: dict[str, object], config: dict[str
         print(f"Project: {messages[0]['content']}", file=output, flush=True)
 
 
-def create_blueprint(agent: Any, project_slug: str, output: TextIO) -> None:
+def create_blueprint(agent: Any, project_slug: str, workspace_root: Path, output: TextIO) -> None:
     """Create the final blueprint.md artifact synthesizing market, customer, and GTM research."""
 
     print("[progress] Creating blueprint.md from research artifacts...", file=output, flush=True)
 
-    try:
-        market_path = Path(f"/projects/{project_slug}/research/market.md")
-        customers_path = Path(f"/projects/{project_slug}/research/customers.md")
-        gtm_path = Path(f"/projects/{project_slug}/strategy/gtm.md")
+    project_root = workspace_root / "projects" / project_slug
+    market_path = project_root / "research" / "market.md"
+    customers_path = project_root / "research" / "customers.md"
+    gtm_path = project_root / "strategy" / "gtm.md"
 
-        artifacts = {}
-        if market_path.exists():
-            artifacts["market_research"] = market_path.read_text(encoding="utf-8")
-        if customers_path.exists():
-            artifacts["customer_research"] = customers_path.read_text(encoding="utf-8")
-        if gtm_path.exists():
-            artifacts["gtm_strategy"] = gtm_path.read_text(encoding="utf-8")
+    artifacts = {}
+    if market_path.exists():
+        artifacts["market_research"] = market_path.read_text(encoding="utf-8")
+    if customers_path.exists():
+        artifacts["customer_research"] = customers_path.read_text(encoding="utf-8")
+    if gtm_path.exists():
+        artifacts["gtm_strategy"] = gtm_path.read_text(encoding="utf-8")
 
-        market_content = artifacts.get("market_research", "")[:1000] if artifacts.get("market_research") else ""
-        customer_content = artifacts.get("customer_research", "")[:1000] if artifacts.get("customer_research") else ""
-        gtm_content = artifacts.get("gtm_strategy", "")[:1000] if artifacts.get("gtm_strategy") else ""
+    market_content = artifacts.get("market_research", "")[:1000] if artifacts.get("market_research") else ""
+    customer_content = artifacts.get("customer_research", "")[:1000] if artifacts.get("customer_research") else ""
+    gtm_content = artifacts.get("gtm_strategy", "")[:1000] if artifacts.get("gtm_strategy") else ""
 
-        blueprint_lines = [
-            "# Product Launch Blueprint",
-            "",
-            f"## Project: {project_slug}",
-            f"Generated: {Path.cwd()}",
-            "",
-            "## Executive Summary",
-            "This blueprint synthesizes market research, customer insights, and go-to-market strategy to provide a comprehensive launch plan.",
-            "",
-            "## Market Research",
-        ]
+    blueprint_lines = [
+        "# Product Launch Blueprint",
+        "",
+        f"## Project: {project_slug}",
+        f"Generated: {Path.cwd()}",
+        "",
+        "## Executive Summary",
+        "This blueprint synthesizes market research, customer insights, and go-to-market strategy to provide a comprehensive launch plan.",
+        "",
+        "## Market Research",
+    ]
 
-        if market_content:
-            blueprint_lines.append(market_content + "...")
-        else:
-            blueprint_lines.append("No market research available")
+    if market_content:
+        blueprint_lines.append(market_content + "...")
+    else:
+        blueprint_lines.append("No market research available")
 
-        blueprint_lines.extend(["", "## Customer Research"])
+    blueprint_lines.extend(["", "## Customer Research"])
 
-        if customer_content:
-            blueprint_lines.append(customer_content + "...")
-        else:
-            blueprint_lines.append("No customer research available")
+    if customer_content:
+        blueprint_lines.append(customer_content + "...")
+    else:
+        blueprint_lines.append("No customer research available")
 
-        blueprint_lines.extend(["", "## GTM Strategy"])
+    blueprint_lines.extend(["", "## GTM Strategy"])
 
-        if gtm_content:
-            blueprint_lines.append(gtm_content + "...")
-        else:
-            blueprint_lines.append("No GTM strategy available")
+    if gtm_content:
+        blueprint_lines.append(gtm_content + "...")
+    else:
+        blueprint_lines.append("No GTM strategy available")
 
-        blueprint_lines.extend([
-            "",
-            "",
-            "## Key Findings & Recommendations",
-            "Based on the synthesized research above, this blueprint provides:",
-            "- Product positioning and messaging",
-            "- Target audience identification",
-            "- Competitive differentiation",
-            "- Go-to-market channels and tactics",
-            "- Launch timeline and milestones",
-            "",
-            "## Next Steps",
-            "1. Review and refine the research insights",
-            "2. Validate assumptions with stakeholders",
-            "3. Execute the launch plan with defined milestones",
-            "4. Monitor and iterate based on performance data",
-            "",
-            "## Assumptions & Limitations",
-            "- Research is based on available data sources",
-            "- Some findings may require additional validation",
-            "- Market conditions may change during launch period",
-            "",
-        ])
+    blueprint_lines.extend([
+        "",
+        "",
+        "## Key Findings & Recommendations",
+        "Based on the synthesized research above, this blueprint provides:",
+        "- Product positioning and messaging",
+        "- Target audience identification",
+        "- Competitive differentiation",
+        "- Go-to-market channels and tactics",
+        "- Launch timeline and milestones",
+        "",
+        "## Next Steps",
+        "1. Review and refine the research insights",
+        "2. Validate assumptions with stakeholders",
+        "3. Execute the launch plan with defined milestones",
+        "4. Monitor and iterate based on performance data",
+        "",
+        "## Assumptions & Limitations",
+        "- Research is based on available data sources",
+        "- Some findings may require additional validation",
+        "- Market conditions may change during launch period",
+        "",
+    ])
 
-        blueprint_content = "\n".join(blueprint_lines)
+    blueprint_content = "\n".join(blueprint_lines)
 
-        blueprint_path = Path(f"/projects/{project_slug}/blueprint.md")
-        blueprint_path.parent.mkdir(parents=True, exist_ok=True)
-        blueprint_path.write_text(blueprint_content, encoding="utf-8")
+    blueprint_path = project_root / "blueprint.md"
+    blueprint_path.parent.mkdir(parents=True, exist_ok=True)
+    blueprint_path.write_text(blueprint_content, encoding="utf-8")
 
-        print(f"[progress] Blueprint created successfully at {blueprint_path}", file=output, flush=True)
-    except Exception as error:
-        print(f"[error] Failed to create blueprint.md: {error}", file=output, flush=True)
+    print(f"[progress] Blueprint created successfully at {blueprint_path}", file=output, flush=True)
