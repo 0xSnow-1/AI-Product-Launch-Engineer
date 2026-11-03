@@ -55,28 +55,30 @@ The reference trial is not a model run.
 ## 4. Run one real agent trial
 
 This command calls the model.
-It runs task 001 in an isolated workspace.
+It runs task 001 in an isolated trial.
+The runner generates the run id and prints the run directory.
 
 ```bash
-run_id="$(date +%Y%m%d-%H%M%S)"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$run_id/trials" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$run_id/summary.json"
+  --html
 ```
 
 Read these files after the run.
+`{run_id}` is the value that the runner prints.
 
 ```text
-workspace/evals/{run_id}/summary.json
-workspace/evals/{run_id}/report.html
-workspace/evals/{run_id}/trials/{task_id}/input.json
-workspace/evals/{run_id}/trials/{task_id}/transcript.jsonl
-workspace/evals/{run_id}/trials/{task_id}/grader_results.json
-workspace/evals/{run_id}/trials/{task_id}/projects/{project_slug}/
+evals/runs/{run_id}/summary.json
+evals/runs/{run_id}/report.html
+evals/runs/{run_id}/trials/{task_id}/input.json
+evals/runs/{run_id}/trials/{task_id}/transcript.jsonl
+evals/runs/{run_id}/trials/{task_id}/grader_results.json
+evals/runs/{run_id}/trials/{task_id}/projects/{project_slug}/
 ```
+
+The run writes only under `evals/runs/`.
+The product workspace stays at `workspace/projects/{project_slug}/`.
 
 `transcript.jsonl` contains process events, model events, and tool events.
 `grader_results.json` shows each deterministic gate.
@@ -99,18 +101,19 @@ It uses inline CSS and minimal inline JavaScript.
 It does not load a CDN, external font, external image, or network resource.
 
 Render the report for one completed task run.
+Use the run directory that the runner printed.
 
 ```bash
-uv run python -m evals.report_html --run "workspace/evals/<run_id>"
+uv run python -m evals.report_html --run "evals/runs/20261103-231500-b2b_recruiting_meeting_assistant"
 ```
 
-The default output is `workspace/evals/<run_id>/report.html`.
+The default output is `<run_dir>/report.html`.
 Use `--output` to write the report to another path.
 
 ```bash
 uv run python -m evals.report_html \
-  --run "workspace/evals/<run_id>" \
-  --output "workspace/evals/<run_id>/custom-report.html"
+  --run "evals/runs/20261103-231500-b2b_recruiting_meeting_assistant" \
+  --output "evals/runs/20261103-231500-b2b_recruiting_meeting_assistant/custom-report.html"
 ```
 
 Render the report for a full suite run.
@@ -126,12 +129,9 @@ The report links to the raw JSON and transcript files.
 This command runs the 15 non-holdout tasks.
 
 ```bash
-run_id="$(date +%Y%m%d-%H%M%S)"
 uv run python -m evals.run_evals \
-  --trial-root "workspace/evals/$run_id/trials" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$run_id/summary.json"
+  --html
 ```
 
 Do not use holdouts while you change prompts.
@@ -141,12 +141,10 @@ Do not use holdouts while you change prompts.
 Use this only after the development suite is stable.
 
 ```bash
-run_id="$(date +%Y%m%d-%H%M%S)"
 uv run python -m evals.run_evals \
   --include-holdouts \
-  --trial-root "workspace/evals/$run_id/trials" \
   --agent-command "uv run python main.py" \
-  --report "workspace/evals/$run_id/summary.json"
+  --html
 ```
 
 ## 8. Add a task for a new bug

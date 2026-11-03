@@ -198,9 +198,9 @@ Then generate a report through the runner.
 ```bash
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root <fixture_trial_root> \
-  --html \
-  --report <summary_path>
+  --runs-root <fixture_runs_root> \
+  --run-id <fixture_run_id> \
+  --html
 ```
 
 ### Expected result
@@ -316,30 +316,26 @@ uv run python -m unittest discover -s tests -v
 ### Commands
 
 Run two trials with different run IDs.
+The runner prints each run directory.
 
 ```bash
-run_id_1="$(date +%Y%m%d-%H%M%S)-a"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$run_id_1/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-a" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$run_id_1/summary.json"
+  --html
 
-run_id_2="$(date +%Y%m%d-%H%M%S)-b"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$run_id_2/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-b" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$run_id_2/summary.json"
+  --html
 ```
 
-Then inspect each run.
+Then inspect each run under `evals/runs/`.
 
 ```bash
-find "workspace/evals/$run_id_1" -maxdepth 8 -type f | sort
-find "workspace/evals/$run_id_2" -maxdepth 8 -type f | sort
+find evals/runs -maxdepth 8 -type f | sort
 ```
 
 A red baseline may make `evals.run_evals` exit with code `1`.
@@ -425,10 +421,9 @@ Then run the judge on one Phase 4 trial.
 ```bash
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/<run_id>/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-judge" \
   --judge \
-  --html \
-  --report "workspace/evals/<run_id>/summary-with-judge.json"
+  --html
 ```
 
 ### Expected result
@@ -546,21 +541,17 @@ Generate an HTML report for each pair.
 Run two trials on the current supervisor.
 
 ```bash
-current_run_1="$(date +%Y%m%d-%H%M%S)-current-a"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$current_run_1/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-current-a" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$current_run_1/summary.json"
+  --html
 
-current_run_2="$(date +%Y%m%d-%H%M%S)-current-b"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$current_run_2/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-current-b" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$current_run_2/summary.json"
+  --html
 ```
 
 Run two trials on the new orchestration branch.
@@ -568,21 +559,17 @@ Use the same task and the same command shape.
 Change only the checked-out branch or the agent entry point.
 
 ```bash
-new_run_1="$(date +%Y%m%d-%H%M%S)-new-a"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$new_run_1/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-new-a" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$new_run_1/summary.json"
+  --html
 
-new_run_2="$(date +%Y%m%d-%H%M%S)-new-b"
 uv run python -m evals.run_evals \
   --task b2b_recruiting_meeting_assistant \
-  --trial-root "workspace/evals/$new_run_2/trials" \
+  --run-id "$(date +%Y%m%d-%H%M%S)-new-b" \
   --agent-command "uv run python main.py" \
-  --html \
-  --report "workspace/evals/$new_run_2/summary.json"
+  --html
 ```
 
 ### Expected result

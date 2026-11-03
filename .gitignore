@@ -3,3 +3,5 @@
 !.env.example
 .venv/
 __pycache__/
+ai-product-launch-engine/evals/runs/
+ai-product-launch-engine/workspace/
