@@ -18,6 +18,30 @@ If `evals/spec.md` does not exist, write it before you change agent behavior.
 If the contract is wrong, change the contract in its own pull request.
 Do not silently work around it in code.
 
+Also read `MVP.md` and `ai-product-launch-engine/MVP_PLAN/PLAN.md` before any MVP work.
+
+## Working style
+
+For non-trivial engineering work, load the `poteto-mode` skill with the skill tool before acting.
+The skill is vendored at `.agents/skills/poteto-mode/SKILL.md`.
+Let the skill route you to a playbook.
+Use the `multi-phase-plan` playbook for work that spans multiple phases or pull requests.
+Skip the plan for one or two file changes with an obvious approach.
+Do not start execution until the operator gives an explicit go.
+The operator's direct instruction wins over any playbook.
+
+## MVP delivery
+
+When the operator says `start phase N`:
+
+1. Load the `poteto-mode` skill.
+2. Read `MVP.md`, `ai-product-launch-engine/MVP_PLAN/PLAN.md`, and the matching section in `ai-product-launch-engine/MVP_PLAN/verification.md`.
+3. Implement only phase N.
+4. Run the phase verification commands and the repo test suite.
+5. Open one pull request and stop at merge-ready with evidence.
+
+Do not start phase N+1 until phase N is merged.
+
 ## Project shape
 
 ```text
