@@ -15,6 +15,11 @@ class Settings:
     bedrock_model_id: str
     bedrock_region: str
     workspace_root: Path
+    slack_bot_token: str
+    slack_app_token: str
+    slack_signing_secret: str
+    database_url: str
+    artifact_root: Path
 
     @classmethod
     def from_environment(
@@ -32,8 +37,15 @@ class Settings:
             or "workspace"
         )
         workspace_root = configured_workspace if configured_workspace.is_absolute() else root / configured_workspace
+        configured_artifacts = Path(values.get("ARTIFACT_ROOT") or "artifacts")
+        artifact_root = configured_artifacts if configured_artifacts.is_absolute() else root / configured_artifacts
         return cls(
             bedrock_model_id=values.get("BEDROCK_MODEL_ID", "anthropic.claude-haiku-4-5-20251001-v1:0"),
             bedrock_region=values.get("BEDROCK_REGION", "us-east-1"),
             workspace_root=workspace_root,
+            slack_bot_token=values.get("SLACK_BOT_TOKEN", ""),
+            slack_app_token=values.get("SLACK_APP_TOKEN", ""),
+            slack_signing_secret=values.get("SLACK_SIGNING_SECRET", ""),
+            database_url=values.get("DATABASE_URL", ""),
+            artifact_root=artifact_root,
         )

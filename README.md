@@ -72,29 +72,32 @@ ai-product-launch-engine/
 │   │   ├── supervisor.py
 │   │   ├── market_researcher.py
 │   │   ├── customer_researcher.py
-│   │   └── gtm_strategist.py
+│   │   ├── gtm_strategist.py
+│   │   ├── common.py
+│   │   └── tools.py
 │   ├── prompts/
-│   │   ├── supervisor/
-│   │   │   └── v1.yaml
-│   │   └── subagents/
-│   │       ├── market_researcher/v1.yaml
-│   │       ├── customer_researcher/v1.yaml
-│   │       └── gtm_strategist/v1.yaml
+│   │   ├── supervisor/         (versioned YAML: v1-v3)
+│   │   └── subagents/          (versioned YAML per agent)
 │   ├── tools/
 │   ├── workflows/
 │   ├── backends/
 │   ├── config.py
-│   └── schemas.py
+│   ├── contracts.py
+│   ├── metrics.py
+│   ├── schemas.py
+│   ├── transcript.py
+│   └── versions.py
 ├── evals/
-│   ├── datasets/
+│   ├── datasets/               (capability and holdout tasks)
+│   ├── reference/              (reference trial)
 │   ├── evaluators.py
 │   └── run_evals.py
 ├── tests/
 ├── workspace/
+├── MVP_PLAN/
 ├── langgraph.json
 ├── pyproject.toml
 ├── .env.example
-├── .gitignore
 └── README.md
 ```
 
@@ -102,19 +105,20 @@ ai-product-launch-engine/
 
 ### Requirements
 
-- Python 3.12 or newer.
+- Python 3.12.
 - AWS credentials with Amazon Bedrock access.
 - A Tavily API key.
 
 ### Setup
 
 ```bash
+cd ai-product-launch-engine
 uv sync
-cp ai-product-launch-engine/.env.example ai-product-launch-engine/.env
+cp .env.example .env
 ```
 
 Set the required values in `ai-product-launch-engine/.env`.
-See `.env.example` for the available variables.
+See `ai-product-launch-engine/.env.example` for the available variables.
 
 ### Run
 
@@ -123,16 +127,34 @@ cd ai-product-launch-engine
 uv run python main.py --input <path-to-request.json>
 ```
 
+The CLI reads a launch request JSON file (idea, audience, constraints), runs the
+supervisor and its three subagents, and writes a launch blueprint zip to the
+workspace. There is no Slack interface yet.
+
 ## Current status
 
-This repository is an early scaffold.
-The supervisor and the three subagents are wired to Amazon Bedrock with the Haiku model and load their prompts from versioned YAML files.
-Evaluation datasets, tests, and the packaging workflow are not implemented yet.
+The command-line launch engine works end to end.
+The supervisor plans with `TodoListMiddleware`, delegates to `market_researcher`,
+`customer_researcher`, and `gtm_strategist`, and assembles a Markdown launch
+blueprint packaged as a zip with a manifest.
+The eval harness runs 20 tasks against 8 deterministic graders.
+The unit suite passes and CI runs the tests and task validation on every pull request.
+
+The MVP scope, plan, and per-phase checks live in [MVP.md](MVP.md) and
+[ai-product-launch-engine/MVP_PLAN/PLAN.md](ai-product-launch-engine/MVP_PLAN/PLAN.md).
+Per-phase verification commands are in
+[MVP_PLAN/verification.md](ai-product-launch-engine/MVP_PLAN/verification.md).
+The MVP data contracts are frozen in
+[ai-product-launch-engine/src/contracts.py](ai-product-launch-engine/src/contracts.py).
+They are not wired into the agent pipeline yet.
+Slack delivery, JSON artifact outputs, async research, persistence, and deployment
+are planned future phases.
 
 ## Roadmap
 
-- Add subagent tools and delegation wiring.
-- Add the launch blueprint schema and validation.
-- Add the virtual filesystem artifact layout.
-- Add the `.zip` packaging step.
-- Add evaluation datasets and evaluators.
+The phase order is defined in
+[ai-product-launch-engine/MVP_PLAN/PLAN.md](ai-product-launch-engine/MVP_PLAN/PLAN.md).
+Phase 0 freezes the data contracts.
+Phases 1 to 6 add structured JSON artifacts, the async research workflow, the
+decision step and GTM guard, Slack integration, persistence, and deployment.
+The Design Agent is deferred to a later plan.
