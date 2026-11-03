@@ -12,6 +12,8 @@ concurrency:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      TAVILY_API_KEY: test-placeholder
     defaults:
       run:
         working-directory: ai-product-launch-engine
