@@ -218,11 +218,10 @@ class ReportHtmlTests(unittest.TestCase):
     def test_runner_html_flag_writes_report_and_keeps_json(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            collection = root / "trials"
-            trial_root = collection / self.task.id
+            run_dir = root / "run"
+            trial_root = run_dir / "trials" / self.task.id
             trial_root.mkdir(parents=True)
             _build_trial(self.task, trial_root, "pass_parallel.jsonl")
-            run_dir = root / "run"
             output = io.StringIO()
             with redirect_stdout(output):
                 exit_code = run_evals_main(
@@ -231,11 +230,11 @@ class ReportHtmlTests(unittest.TestCase):
                         str(DATASET),
                         "--task",
                         self.task.id,
-                        "--trial-root",
-                        str(collection),
+                        "--runs-root",
+                        str(root),
+                        "--run-id",
+                        "run",
                         "--html",
-                        "--report",
-                        str(run_dir / "summary.json"),
                     ]
                 )
             self.assertEqual(exit_code, 0)
