@@ -1,0 +1,114 @@
+{
+  "passed": false,
+  "results": [
+    {
+      "details": {
+        "missing_artifacts": [
+          "/projects/b2b-recruiting-meeting-assistant/research/market.md"
+        ]
+      },
+      "grader_name": "artifact_exists",
+      "passed": false,
+      "score": 0.0
+    },
+    {
+      "details": {
+        "deprecated_path": "/workspace/research",
+        "exists": false
+      },
+      "grader_name": "deprecated_path",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {
+        "missing_sections": {
+          "/projects/b2b-recruiting-meeting-assistant/research/market.md": [
+            "Competitor Landscape",
+            "Market Opportunities",
+            "Trends and Insights",
+            "Sources"
+          ]
+        }
+      },
+      "grader_name": "section_coverage",
+      "passed": false,
+      "score": 0.0
+    },
+    {
+      "details": {
+        "invalid_urls": [],
+        "required_sources": 3,
+        "unique_source_count": 0
+      },
+      "grader_name": "source_citations",
+      "passed": false,
+      "score": 0.0
+    },
+    {
+      "details": {
+        "errors": []
+      },
+      "grader_name": "manifest",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {
+        "missing_entries": []
+      },
+      "grader_name": "archive",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {
+        "placeholders": {}
+      },
+      "grader_name": "placeholders",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {
+        "delegated_subagents": [
+          "customer_researcher",
+          "gtm_strategist",
+          "market_researcher"
+        ],
+        "errors": [
+          "gtm_strategist started before customer_researcher finished"
+        ],
+        "finish_times": {
+          "customer_researcher": "2026-11-01T00:00:10+00:00",
+          "gtm_strategist": "2026-11-01T00:00:20+00:00",
+          "market_researcher": "2026-11-01T00:00:05+00:00"
+        },
+        "gtm_after_both_research": false,
+        "invalid_delegation_events": [],
+        "max_tool_calls": 60,
+        "missing_run_id_lines": [],
+        "missing_subagents": [],
+        "required_subagents": [
+          "market_researcher",
+          "customer_researcher",
+          "gtm_strategist"
+        ],
+        "research_artifact_writes": [],
+        "start_times": {
+          "customer_researcher": "2026-11-01T00:00:06+00:00",
+          "gtm_strategist": "2026-11-01T00:00:07+00:00",
+          "market_researcher": "2026-11-01T00:00:00+00:00"
+        },
+        "tool_call_count": 3,
+        "unfinished_subagents": [],
+        "unpaired_finish_lines": []
+      },
+      "grader_name": "delegation",
+      "passed": false,
+      "score": 0.0
+    }
+  ],
+  "task_id": "b2b_recruiting_meeting_assistant",
+  "trial_root": "/home/snowaflic/GTM-autonomous/ai-product-launch-engine/evals/artifacts/phase2-fail/trials/b2b_recruiting_meeting_assistant"
+}

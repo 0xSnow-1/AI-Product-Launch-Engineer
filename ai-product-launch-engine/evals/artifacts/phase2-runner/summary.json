@@ -1,0 +1,119 @@
+{
+  "run_id": "phase2-runner",
+  "created_at": "2026-11-02T00:00:00Z",
+  "commit": "sample",
+  "model_id": "sample-model",
+  "passed": true,
+  "reports": [
+    {
+      "task_id": "b2b_recruiting_meeting_assistant",
+      "trial_root": "trials/b2b_recruiting_meeting_assistant",
+      "passed": true,
+      "results": [
+        {
+          "grader_name": "artifact_exists",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "missing_artifacts": []
+          }
+        },
+        {
+          "grader_name": "deprecated_path",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "deprecated_path": "/workspace/research",
+            "exists": false
+          }
+        },
+        {
+          "grader_name": "section_coverage",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "missing_sections": {}
+          }
+        },
+        {
+          "grader_name": "source_citations",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "required_sources": 3,
+            "unique_source_count": 4,
+            "invalid_urls": []
+          }
+        },
+        {
+          "grader_name": "manifest",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "errors": []
+          }
+        },
+        {
+          "grader_name": "archive",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "missing_entries": []
+          }
+        },
+        {
+          "grader_name": "placeholders",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "placeholders": {}
+          }
+        },
+        {
+          "grader_name": "delegation",
+          "passed": true,
+          "score": 1.0,
+          "details": {
+            "required_subagents": [
+              "market_researcher",
+              "customer_researcher",
+              "gtm_strategist"
+            ],
+            "max_tool_calls": 60,
+            "delegated_subagents": [
+              "customer_researcher",
+              "gtm_strategist",
+              "market_researcher"
+            ],
+            "missing_subagents": [],
+            "start_times": {
+              "market_researcher": "2026-11-01T00:00:00+00:00",
+              "customer_researcher": "2026-11-01T00:00:01+00:00",
+              "gtm_strategist": "2026-11-01T00:00:13+00:00"
+            },
+            "finish_times": {
+              "market_researcher": "2026-11-01T00:00:10+00:00",
+              "customer_researcher": "2026-11-01T00:00:11+00:00",
+              "gtm_strategist": "2026-11-01T00:00:20+00:00"
+            },
+            "gtm_after_both_research": true,
+            "tool_call_count": 5,
+            "unfinished_subagents": [],
+            "missing_run_id_lines": [],
+            "unpaired_finish_lines": [],
+            "invalid_delegation_events": [],
+            "research_artifact_writes": [
+              {
+                "line": 6,
+                "tool": "write_file",
+                "path": "research/market.md"
+              }
+            ],
+            "errors": []
+          }
+        }
+      ]
+    }
+  ],
+  "executions": []
+}
