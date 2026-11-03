@@ -18,11 +18,14 @@ They do not depend on a model, a search provider, or a network connection.
 ## What a real run must save
 
 I will give every run an identifier.
-I will save its files under `workspace/evals/{run_id}/`.
+I will save its files under `evals/runs/{run_id}/`.
+The product workspace stays separate.
+It holds only `workspace/projects/{project_slug}/`.
 
 ```text
-workspace/evals/{run_id}/
+evals/runs/{run_id}/
 ├── summary.json
+├── report.html
 └── trials/{task_id}/
     ├── input.json
     ├── transcript.jsonl
