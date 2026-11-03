@@ -4,6 +4,19 @@ Implementation package for the AI Product Launch Engineer.
 
 See the [root README](../README.md) for the project overview, architecture, and setup instructions.
 
+## Contracts
+
+`src/contracts.py` freezes the data contracts for the MVP: research artifacts,
+the GTM strategy, the strategic decision, the launch pack, and the project record.
+Later phases validate agent output and persist these models.
+
+## MVP plan
+
+The MVP scope, phase order, and per-phase checks live in
+[MVP_PLAN/PLAN.md](MVP_PLAN/PLAN.md) and
+[MVP_PLAN/verification.md](MVP_PLAN/verification.md).
+The MVP specification is [MVP.md](../MVP.md) at the repository root.
+
 ## Agent entry points
 
 - `src/agents/supervisor.py`

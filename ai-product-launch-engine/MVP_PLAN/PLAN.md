@@ -48,13 +48,14 @@ Implemented:
 - Markdown artifacts: `research/market.md`, `research/customers.md`, `strategy/gtm.md`, `blueprint.md`.
 - Manifest and zip packaging.
 - Eval harness with 20 tasks and 8 deterministic graders.
-- 48 unit tests.
+- Unit suite (89 tests after Phase 0).
 - CI workflow that runs tests and task validation.
+- MVP data contracts in `src/contracts.py` (Phase 0).
+- Phase 0 configuration fields: Slack tokens, `DATABASE_URL`, `ARTIFACT_ROOT`.
 
 Missing:
 
 - Structured JSON research and strategy outputs.
-- Pydantic artifact contracts.
 - Async research with task tracking.
 - Strategic decision modes and the eight-second timeout.
 - Backend-enforced GTM guard.
@@ -131,11 +132,11 @@ Define the contracts first.
 
 ### Things to implement
 
-- [ ] Write the current-state audit in this file.
+- [x] Write the current-state audit in this file.
   - List implemented features.
   - List missing features.
   - List the open failures from `Failures.md`.
-- [ ] Add `src/contracts.py`.
+- [x] Add `src/contracts.py`.
   - Add `EvidenceRef`: title, url, retrieved_at, claim_ids.
   - Add `Claim`: id, text, kind (`fact`, `interpretation`, `assumption`, `recommendation`), evidence_refs.
   - Add `MarketResearch`: project_id, generated_at, summary, competitors, market_opportunities, trends, claims, assumptions, limitations.
@@ -146,21 +147,21 @@ Define the contracts first.
   - Add `LaunchPack`: project_id, idea, market, customer, gtm, decision, evidence_index.
   - Add `ProjectRecord`: project_id, idea, audience, constraints, mode, status, created_at, updated_at.
   - Export every public contract in `__all__`.
-- [ ] Add `src/config.py` fields.
+- [x] Add `src/config.py` fields.
   - `slack_bot_token`, `slack_app_token`, `slack_signing_secret`.
   - `database_url`.
   - `artifact_root`.
-- [ ] Add `tests/test_contracts.py`.
+- [x] Add `tests/test_contracts.py`.
   - Valid examples parse.
   - Missing required fields fail.
   - A claim with kind `fact` and no evidence fails.
-- [ ] Update `README.md`.
+- [x] Update `README.md`.
   - Replace the outdated "early scaffold" status.
   - Link to `MVP.md` and `MVP_PLAN/PLAN.md`.
   - Document the current command-line behavior only.
-- [ ] Update `ai-product-launch-engine/README.md`.
+- [x] Update `ai-product-launch-engine/README.md`.
   - Add the contracts module and the MVP plan link.
-- [ ] Update `.env.example`.
+- [x] Update `.env.example`.
   - Add the new configuration keys with empty values.
 
 ### Files to touch
@@ -176,11 +177,11 @@ Define the contracts first.
 
 ### Done when
 
-- [ ] `uv run python -m unittest tests.test_contracts -v` passes.
-- [ ] `uv run python -m unittest discover -s tests` passes.
-- [ ] Every contract rejects an invalid example in a test.
-- [ ] The README status matches the code.
-- [ ] No phase 1 or later behavior is implemented.
+- [x] `uv run python -m unittest tests.test_contracts -v` passes.
+- [x] `uv run python -m unittest discover -s tests` passes.
+- [x] Every contract rejects an invalid example in a test.
+- [x] The README status matches the code.
+- [x] No phase 1 or later behavior is implemented.
 
 ### Out of scope
 
