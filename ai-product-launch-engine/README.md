@@ -8,7 +8,8 @@ See the [root README](../README.md) for the project overview, architecture, and 
 
 `src/contracts.py` freezes the data contracts for the MVP: research artifacts,
 the GTM strategy, the strategic decision, the launch pack, and the project record.
-Later phases validate agent output and persist these models.
+`src/workflows/validation.py` loads the three specialist JSON artifacts and
+validates them against those models.
 
 ## MVP plan
 
@@ -26,10 +27,10 @@ The MVP specification is [MVP.md](../MVP.md) at the repository root.
 
 ## Prompt layout
 
-- `src/prompts/supervisor/v2.yaml`
-- `src/prompts/subagents/market_researcher/v2.yaml`
-- `src/prompts/subagents/customer_researcher/v2.yaml`
-- `src/prompts/subagents/gtm_strategist/v2.yaml`
+- `src/prompts/supervisor/v4.yaml`
+- `src/prompts/subagents/market_researcher/v3.yaml`
+- `src/prompts/subagents/customer_researcher/v3.yaml`
+- `src/prompts/subagents/gtm_strategist/v3.yaml`
 
 ## Run
 

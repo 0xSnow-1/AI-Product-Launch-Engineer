@@ -37,6 +37,82 @@ def _model_name(serialized: Any, metadata: Any) -> str | None:
     return None
 
 
+def _int_or_none(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
+def _usage_from_mapping(value: Any) -> dict[str, int] | None:
+    if not isinstance(value, Mapping):
+        return None
+    input_tokens = _int_or_none(value.get("input_tokens"))
+    output_tokens = _int_or_none(value.get("output_tokens"))
+    total_tokens = _int_or_none(value.get("total_tokens"))
+    if input_tokens is None:
+        input_tokens = _int_or_none(value.get("inputTokens"))
+    if output_tokens is None:
+        output_tokens = _int_or_none(value.get("outputTokens"))
+    if total_tokens is None:
+        total_tokens = _int_or_none(value.get("totalTokens"))
+    if total_tokens is None and (input_tokens is not None or output_tokens is not None):
+        total_tokens = (input_tokens or 0) + (output_tokens or 0)
+    usage: dict[str, int] = {}
+    if input_tokens is not None:
+        usage["input_tokens"] = input_tokens
+    if output_tokens is not None:
+        usage["output_tokens"] = output_tokens
+    if total_tokens is not None:
+        usage["total_tokens"] = total_tokens
+    return usage or None
+
+
+def _usage_from_llm_output(response: Any) -> dict[str, int] | None:
+    llm_output = getattr(response, "llm_output", None)
+    if not isinstance(llm_output, Mapping):
+        return None
+    direct = _usage_from_mapping(llm_output)
+    if direct is not None:
+        return direct
+    return _usage_from_mapping(llm_output.get("usage"))
+
+
+def _usage_from_generations(response: Any) -> dict[str, int] | None:
+    generations = getattr(response, "generations", None)
+    if not isinstance(generations, list):
+        return None
+    input_tokens = 0
+    output_tokens = 0
+    total_tokens = 0
+    found = False
+    for group in generations:
+        if not isinstance(group, list):
+            continue
+        for generation in group:
+            message = getattr(generation, "message", None)
+            usage = _usage_from_mapping(getattr(message, "usage_metadata", None))
+            if usage is None:
+                metadata = getattr(message, "response_metadata", None)
+                usage = _usage_from_mapping(metadata.get("usage")) if isinstance(metadata, Mapping) else None
+            if usage is None:
+                continue
+            found = True
+            input_tokens += usage.get("input_tokens", 0)
+            output_tokens += usage.get("output_tokens", 0)
+            total_tokens += usage.get("total_tokens", 0)
+    if not found:
+        return None
+    return {
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "total_tokens": total_tokens,
+    }
+
+
+def _usage_from_response(response: Any) -> dict[str, int] | None:
+    return _usage_from_generations(response) or _usage_from_llm_output(response)
+
+
 class JsonlCallbackHandler:
     """Create a LangChain callback handler only when a transcript path is configured."""
 
@@ -98,10 +174,11 @@ class JsonlCallbackHandler:
             ) -> None:
                 key = _identifier(run_id)
                 name = self._model_names.pop(key, None) if key is not None else None
-                self._write(
-                    "model_finished",
-                    {**self._context(run_id, parent_run_id, tags, metadata), "model": name, "response": response},
-                )
+                usage = _usage_from_response(response)
+                payload = {**self._context(run_id, parent_run_id, tags, metadata), "model": name, "response": response}
+                if usage is not None:
+                    payload["usage"] = usage
+                self._write("model_finished", payload)
 
             def on_llm_error(
                 self,

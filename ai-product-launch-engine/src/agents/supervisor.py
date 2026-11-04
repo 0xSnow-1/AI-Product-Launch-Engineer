@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, Iterable, TextIO
 
 import boto3
 import yaml
@@ -19,11 +19,12 @@ from agents.gtm_strategist import gtm_strategist
 from agents.market_researcher import market_researcher
 from agents.tools import search_tool
 from src.config import Settings
+from src.workflows.validation import validate_project
 
 
 load_dotenv()
 
-PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "supervisor" / "v2.yaml"
+PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "supervisor" / "v4.yaml"
 SYSTEM_PROMPT = yaml.safe_load(PROMPT_PATH.read_text(encoding="utf-8"))["system_prompt"]
 
 settings = Settings.from_environment(project_root=Path(__file__).resolve().parents[2])
@@ -106,76 +107,70 @@ def create_blueprint(agent: Any, project_slug: str, workspace_root: Path, output
     print("[progress] Creating blueprint.md from research artifacts...", file=output, flush=True)
 
     project_root = workspace_root / "projects" / project_slug
-    market_path = project_root / "research" / "market.md"
-    customers_path = project_root / "research" / "customers.md"
-    gtm_path = project_root / "strategy" / "gtm.md"
+    artifacts = validate_project(project_root)
+    market = artifacts["market_research"]
+    customer = artifacts["customer_research"]
+    gtm = artifacts["gtm_strategy"]
 
-    artifacts = {}
-    if market_path.exists():
-        artifacts["market_research"] = market_path.read_text(encoding="utf-8")
-    if customers_path.exists():
-        artifacts["customer_research"] = customers_path.read_text(encoding="utf-8")
-    if gtm_path.exists():
-        artifacts["gtm_strategy"] = gtm_path.read_text(encoding="utf-8")
+    def _bullets(items: Iterable[str]) -> list[str]:
+        return [f"- {item}" for item in items] or ["- None recorded"]
 
-    market_content = artifacts.get("market_research", "")[:1000] if artifacts.get("market_research") else ""
-    customer_content = artifacts.get("customer_research", "")[:1000] if artifacts.get("customer_research") else ""
-    gtm_content = artifacts.get("gtm_strategy", "")[:1000] if artifacts.get("gtm_strategy") else ""
+    competitor_lines = [f"- {competitor.name}: {competitor.positioning}" for competitor in market.competitors] or ["- None recorded"]
+    persona_lines = [f"- {persona.name} ({persona.role})" for persona in customer.personas] or ["- None recorded"]
+    roadmap_lines = [f"- {phase.name} ({phase.timeline})" for phase in gtm.launch_roadmap] or ["- None recorded"]
 
     blueprint_lines = [
         "# Product Launch Blueprint",
         "",
         f"## Project: {project_slug}",
-        f"Generated: {Path.cwd()}",
-        "",
-        "## Executive Summary",
-        "This blueprint synthesizes market research, customer insights, and go-to-market strategy to provide a comprehensive launch plan.",
         "",
         "## Market Research",
+        market.summary,
+        "",
+        "Competitors:",
+        *competitor_lines,
+        "",
+        "Market opportunities:",
+        *_bullets(market.market_opportunities),
+        "",
+        "Trends:",
+        *_bullets(market.trends),
+        "",
+        "## Customer Research",
+        f"Ideal customer profile: {customer.ideal_customer_profile}",
+        "",
+        "Personas:",
+        *persona_lines,
+        "",
+        "Pain points:",
+        *_bullets(customer.pain_points),
+        "",
+        "Buying triggers:",
+        *_bullets(customer.buying_triggers),
+        "",
+        "## GTM Strategy",
+        f"Positioning: {gtm.positioning}",
+        "",
+        f"Differentiation: {gtm.differentiation}",
+        "",
+        "Channels:",
+        *_bullets(gtm.channels),
+        "",
+        "Launch roadmap:",
+        *roadmap_lines,
+        "",
+        "## Risks and Assumptions",
     ]
 
-    if market_content:
-        blueprint_lines.append(market_content + "...")
-    else:
-        blueprint_lines.append("No market research available")
-
-    blueprint_lines.extend(["", "## Customer Research"])
-
-    if customer_content:
-        blueprint_lines.append(customer_content + "...")
-    else:
-        blueprint_lines.append("No customer research available")
-
-    blueprint_lines.extend(["", "## GTM Strategy"])
-
-    if gtm_content:
-        blueprint_lines.append(gtm_content + "...")
-    else:
-        blueprint_lines.append("No GTM strategy available")
-
-    blueprint_lines.extend([
-        "",
-        "",
-        "## Key Findings & Recommendations",
-        "Based on the synthesized research above, this blueprint provides:",
-        "- Product positioning and messaging",
-        "- Target audience identification",
-        "- Competitive differentiation",
-        "- Go-to-market channels and tactics",
-        "- Launch timeline and milestones",
-        "",
-        "## Next Steps",
-        "1. Review and refine the research insights",
-        "2. Validate assumptions with stakeholders",
-        "3. Execute the launch plan with defined milestones",
-        "4. Monitor and iterate based on performance data",
-        "",
-        "## Assumptions & Limitations",
-        "- Research is based on available data sources",
-        "- Some findings may require additional validation",
-        "- Market conditions may change during launch period",
-        "",
-    ])
+    risk_lines: list[str] = []
+    for assumption in [*market.assumptions, *customer.assumptions, *gtm.assumptions]:
+        risk_lines.append(f"- Assumption: {assumption}")
+    for risk in gtm.risks:
+        risk_lines.append(f"- Risk: {risk}")
+    for limitation in [*market.limitations, *customer.limitations]:
+        risk_lines.append(f"- Limitation: {limitation}")
+    blueprint_lines.extend(risk_lines or ["- None recorded"])
+    blueprint_lines.append("")
 
     blueprint_content = "\n".join(blueprint_lines)
 

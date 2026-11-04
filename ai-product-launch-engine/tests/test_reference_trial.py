@@ -11,6 +11,7 @@ from pathlib import Path
 from evals.evaluators import (
     ArchiveGrader,
     ArtifactExistsGrader,
+    ArtifactSchemaGrader,
     DeprecatedPathGrader,
     ManifestGrader,
     PlaceholderGrader,
@@ -24,15 +25,16 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET = PROJECT_ROOT / "evals" / "datasets" / "capability" / "b2b_recruiting_meeting_assistant.json"
 REFERENCE_ROOT = PROJECT_ROOT / "evals" / "reference" / "b2b_recruiting_meeting_assistant"
 ARCHIVE_FILES = (
-    "research/market.md",
-    "research/customers.md",
-    "strategy/gtm.md",
+    "research/market_research.json",
+    "research/customer_research.json",
+    "strategy/gtm_strategy.json",
     "blueprint.md",
     "manifest.json",
 )
 ARTIFACT_GRADERS = (
     ArtifactExistsGrader(),
     DeprecatedPathGrader(),
+    ArtifactSchemaGrader(),
     SectionCoverageGrader(),
     SourceCitationGrader(),
     ManifestGrader(),
@@ -65,6 +67,7 @@ class ReferenceTrialTests(unittest.TestCase):
             [
                 "artifact_exists",
                 "deprecated_path",
+                "artifact_schemas",
                 "section_coverage",
                 "source_citations",
                 "manifest",

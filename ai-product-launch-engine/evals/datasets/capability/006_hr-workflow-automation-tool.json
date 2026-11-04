@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "hr-workflow-automation-tool",
     "artifacts": [
-      "/projects/hr-workflow-automation-tool/research/market.md",
-      "/projects/hr-workflow-automation-tool/research/customers.md",
-      "/projects/hr-workflow-automation-tool/strategy/gtm.md",
+      "/projects/hr-workflow-automation-tool/research/market_research.json",
+      "/projects/hr-workflow-automation-tool/research/customer_research.json",
+      "/projects/hr-workflow-automation-tool/strategy/gtm_strategy.json",
       "/projects/hr-workflow-automation-tool/blueprint.md",
       "/projects/hr-workflow-automation-tool/manifest.json",
       "/projects/hr-workflow-automation-tool/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/hr-workflow-automation-tool/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/hr-workflow-automation-tool/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/hr-workflow-automation-tool/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/hr-workflow-automation-tool/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,8 @@
       "customer_researcher",
       "gtm_strategist",
       "supervisor"
-    ]
+    ],
+    "max_tool_calls": 80
   },
   "guardrails": [
     "Use a credible, opened source for each material market statistic, competitor claim, pricing claim, and trend claim.",

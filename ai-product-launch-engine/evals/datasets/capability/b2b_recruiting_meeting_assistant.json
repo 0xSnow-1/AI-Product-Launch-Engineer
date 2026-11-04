@@ -15,36 +15,14 @@
   "expected": {
     "project_slug": "b2b-recruiting-meeting-assistant",
     "artifacts": [
-      "/projects/b2b-recruiting-meeting-assistant/research/market.md",
-      "/projects/b2b-recruiting-meeting-assistant/research/customers.md",
-      "/projects/b2b-recruiting-meeting-assistant/strategy/gtm.md",
+      "/projects/b2b-recruiting-meeting-assistant/research/market_research.json",
+      "/projects/b2b-recruiting-meeting-assistant/research/customer_research.json",
+      "/projects/b2b-recruiting-meeting-assistant/strategy/gtm_strategy.json",
       "/projects/b2b-recruiting-meeting-assistant/blueprint.md",
       "/projects/b2b-recruiting-meeting-assistant/manifest.json",
       "/projects/b2b-recruiting-meeting-assistant/deliverable.zip"
     ],
     "required_sections": {
-      "/projects/b2b-recruiting-meeting-assistant/research/market.md": [
-        "Competitor Landscape",
-        "Market Opportunities",
-        "Trends and Insights",
-        "Sources"
-      ],
-      "/projects/b2b-recruiting-meeting-assistant/research/customers.md": [
-        "Ideal Customer Profile",
-        "Personas",
-        "Customer Problems",
-        "Buying Triggers",
-        "Assumptions and Open Questions"
-      ],
-      "/projects/b2b-recruiting-meeting-assistant/strategy/gtm.md": [
-        "Positioning Statement",
-        "Value Proposition",
-        "Messaging by Channel",
-        "Distribution Plan",
-        "Launch Sequence",
-        "Launch Goals",
-        "Risks and Assumptions"
-      ],
       "/projects/b2b-recruiting-meeting-assistant/blueprint.md": [
         "Market Research",
         "Customer Research",
@@ -58,7 +36,7 @@
       "customer_researcher",
       "gtm_strategist"
     ],
-    "max_tool_calls": 60,
+    "max_tool_calls": 80,
     "manifest_agents": [
       "market_researcher",
       "customer_researcher",

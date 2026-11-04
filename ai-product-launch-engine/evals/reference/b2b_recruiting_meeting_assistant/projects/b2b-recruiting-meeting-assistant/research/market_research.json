@@ -1,0 +1,116 @@
+{
+  "project_id": "b2b-recruiting-meeting-assistant",
+  "generated_at": "2026-11-02T00:00:00Z",
+  "summary": "Small US recruiting agencies run high call volume with few operations staff. The market splits into recruiting platforms with bundled notes, general transcription services, and applicant tracking system add-ons. The open gap is a recruiting-specific assistant that extracts candidate requirements and writes structured follow-up actions into the ATS.",
+  "competitors": [
+    {
+      "name": "Recruiting platforms with built-in notes",
+      "positioning": "Bundle scheduling, candidate messaging, and notes",
+      "strengths": ["Integrated workflow", "Single vendor"],
+      "weaknesses": ["No recruiting-specific extraction", "Locked to one platform"]
+    },
+    {
+      "name": "General transcription services",
+      "positioning": "Broad language support with little recruiting logic",
+      "strengths": ["Strong transcription quality", "Wide language coverage"],
+      "weaknesses": ["Stops at a transcript", "No ATS follow-up actions"]
+    },
+    {
+      "name": "Applicant tracking system add-ons",
+      "positioning": "Deep single-vendor integration",
+      "strengths": ["Deep ATS integration"],
+      "weaknesses": ["Limited cross-platform use"]
+    }
+  ],
+  "market_opportunities": [
+    "Small agencies lack structured intake notes and retype them into the ATS",
+    "Structured notes reduce rework and improve candidate handoffs",
+    "A paid pilot can prove time savings within one hiring cycle"
+  ],
+  "trends": [
+    "Remote intake calls are common, so recordings are already available",
+    "Buyers expect data controls for candidate personal data",
+    "Integration quality is a primary purchase criterion",
+    "Agencies prefer tools that work with their current ATS"
+  ],
+  "claims": [
+    {
+      "id": "market-1",
+      "text": "Human-resources specialists are a documented US occupation with published employment outlook data.",
+      "kind": "fact",
+      "evidence_refs": [
+        {
+          "title": "Occupational Outlook Handbook: Human Resources Specialists",
+          "url": "https://www.bls.gov/ooh/business-and-financial/human-resources-specialists.htm",
+          "retrieved_at": "2026-11-02T00:00:00Z",
+          "claim_ids": ["market-1"]
+        }
+      ]
+    },
+    {
+      "id": "market-2",
+      "text": "Small US recruiting agencies are business establishments covered by Census Bureau small-business statistics.",
+      "kind": "fact",
+      "evidence_refs": [
+        {
+          "title": "Census Bureau: Small Business Data",
+          "url": "https://www.census.gov/programs-surveys/susb.html",
+          "retrieved_at": "2026-11-02T00:00:00Z",
+          "claim_ids": ["market-2"]
+        }
+      ]
+    },
+    {
+      "id": "market-3",
+      "text": "Handling candidate personal data requires a breach response plan consistent with federal guidance.",
+      "kind": "fact",
+      "evidence_refs": [
+        {
+          "title": "Federal Trade Commission: Data Breach Response",
+          "url": "https://www.ftc.gov/business-guidance/resources/data-breach-response-guide-business",
+          "retrieved_at": "2026-11-02T00:00:00Z",
+          "claim_ids": ["market-3"]
+        }
+      ]
+    },
+    {
+      "id": "market-4",
+      "text": "Talent acquisition is a documented recruiting function with established practice guidance.",
+      "kind": "fact",
+      "evidence_refs": [
+        {
+          "title": "SHRM: Talent Acquisition",
+          "url": "https://www.shrm.org/topics-tools/news/talent-acquisition",
+          "retrieved_at": "2026-11-02T00:00:00Z",
+          "claim_ids": ["market-4"]
+        }
+      ]
+    },
+    {
+      "id": "market-5",
+      "text": "The open gap is a recruiting-specific assistant that extracts candidate requirements and sends structured follow-up actions into the ATS.",
+      "kind": "interpretation",
+      "evidence_refs": []
+    },
+    {
+      "id": "market-6",
+      "text": "A narrow tool for small agencies can win on fit and speed, not on feature breadth.",
+      "kind": "interpretation",
+      "evidence_refs": []
+    },
+    {
+      "id": "market-7",
+      "text": "The launch should lead with ATS integration and data handling, not with model quality alone.",
+      "kind": "recommendation",
+      "evidence_refs": []
+    }
+  ],
+  "assumptions": [
+    "Small agencies will accept a paid pilot within 90 days",
+    "Remote recordings of intake calls are already available in pilot agencies"
+  ],
+  "limitations": [
+    "No primary market-size estimate is provided",
+    "No survey of agency owners was run for this reference trial"
+  ]
+}

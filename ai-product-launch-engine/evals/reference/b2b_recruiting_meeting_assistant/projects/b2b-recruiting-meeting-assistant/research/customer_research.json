@@ -1,0 +1,80 @@
+{
+  "project_id": "b2b-recruiting-meeting-assistant",
+  "generated_at": "2026-11-02T00:00:00Z",
+  "segments": [
+    {
+      "name": "Small US recruiting agencies",
+      "description": "Agencies with 5 to 50 recruiters placing candidates in hourly, technical, or professional roles",
+      "characteristics": [
+        "Uses an ATS for candidates and job orders",
+        "Runs intake and screening calls on video or phone",
+        "High call volume with few operations staff"
+      ],
+      "pain_points": [
+        "Notes are inconsistent across recruiters",
+        "Follow-up actions are lost after a call"
+      ]
+    }
+  ],
+  "personas": [
+    {
+      "name": "Agency owner",
+      "role": "Buyer",
+      "goals": ["Recruiter output without added headcount", "Clean data in the ATS"],
+      "pain_points": ["Retyping notes into the ATS takes time", "Candidate handoffs are inconsistent"]
+    },
+    {
+      "name": "Senior recruiter",
+      "role": "Daily user",
+      "goals": ["Spend less time on call admin"],
+      "pain_points": ["Manual note writing after each intake call"]
+    },
+    {
+      "name": "Recruiting coordinator",
+      "role": "Operations",
+      "goals": ["Consistent candidate records"],
+      "pain_points": ["Cleans notes and moves candidates between stages"]
+    }
+  ],
+  "pain_points": [
+    "Notes are inconsistent across recruiters",
+    "Follow-up actions are lost after a call",
+    "Retyping notes into the ATS takes time",
+    "Candidate requirements are hard to compare across roles"
+  ],
+  "buying_triggers": [
+    "New client volume exceeds current staff capacity",
+    "A recruiter leaves and notes are incomplete",
+    "The agency adopts a new ATS and wants clean data",
+    "A client asks for faster candidate summaries"
+  ],
+  "ideal_customer_profile": "US recruiting agency with 5 to 50 recruiters that places candidates in hourly, technical, or professional roles and runs intake and screening calls on video or phone.",
+  "claims": [
+    {
+      "id": "customer-1",
+      "text": "The best first buyer is an agency owner who also manages a small recruiter team.",
+      "kind": "interpretation",
+      "evidence_refs": []
+    },
+    {
+      "id": "customer-2",
+      "text": "The coordinator feels the rework, and the owner sees the cost.",
+      "kind": "interpretation",
+      "evidence_refs": []
+    },
+    {
+      "id": "customer-3",
+      "text": "Agencies will accept a paid pilot within 90 days.",
+      "kind": "assumption",
+      "evidence_refs": []
+    }
+  ],
+  "assumptions": [
+    "Agencies will accept a paid pilot within 90 days",
+    "ATS vendors allow write access through a supported interface"
+  ],
+  "limitations": [
+    "No interviews or surveys were run for this reference trial",
+    "The retention period agencies require for call recordings is unknown"
+  ]
+}

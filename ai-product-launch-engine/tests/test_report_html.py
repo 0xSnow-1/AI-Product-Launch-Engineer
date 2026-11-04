@@ -23,9 +23,9 @@ DATASET = PROJECT_ROOT / "evals" / "datasets" / "capability" / "b2b_recruiting_m
 REFERENCE_ROOT = PROJECT_ROOT / "evals" / "reference" / "b2b_recruiting_meeting_assistant"
 FIXTURES = PROJECT_ROOT / "evals" / "fixtures" / "transcripts"
 ARCHIVE_FILES = (
-    "research/market.md",
-    "research/customers.md",
-    "strategy/gtm.md",
+    "research/market_research.json",
+    "research/customer_research.json",
+    "strategy/gtm_strategy.json",
     "blueprint.md",
     "manifest.json",
 )
@@ -66,7 +66,7 @@ def _build_trial(
         for name in ARCHIVE_FILES:
             archive.write(project_root / name, arcname=name)
     if missing_market:
-        (project_root / "research" / "market.md").unlink()
+        (project_root / "research" / "market_research.json").unlink()
     _write_input(trial_root, task)
     shutil.copyfile(FIXTURES / transcript_fixture, trial_root / "transcript.jsonl")
     report = grade_trial(task, trial_root)

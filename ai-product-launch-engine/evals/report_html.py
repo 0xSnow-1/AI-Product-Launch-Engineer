@@ -16,9 +16,9 @@ from markdown_it import MarkdownIt
 
 
 ARTIFACT_FILES: tuple[tuple[str, str], ...] = (
-    ("Market Research", "research/market.md"),
-    ("Customer Research", "research/customers.md"),
-    ("GTM Strategy", "strategy/gtm.md"),
+    ("Market Research", "research/market_research.json"),
+    ("Customer Research", "research/customer_research.json"),
+    ("GTM Strategy", "strategy/gtm_strategy.json"),
     ("Blueprint", "blueprint.md"),
     ("Manifest", "manifest.json"),
     ("Archive", "deliverable.zip"),
@@ -30,6 +30,7 @@ TIMELINE_SUBAGENTS = ("market_researcher", "customer_researcher", "gtm_strategis
 FAILURE_CLASSES: dict[str, str] = {
     "artifact_exists": "Missing artifact",
     "deprecated_path": "Wrong path",
+    "artifact_schemas": "Invalid artifact",
     "section_coverage": "Missing section",
     "source_citations": "Unsupported claim",
     "manifest": "Missing artifact",
@@ -495,7 +496,7 @@ def _render_artifact_panel(project_root: Path | None, relative_path: str) -> str
         if text is None:
             return _empty(f"Cannot read artifact: {relative_path}")
         return _render_markdown(text)
-    if relative_path == "manifest.json":
+    if relative_path.endswith(".json"):
         text = _read_text(path)
         if text is None:
             return _empty(f"Cannot read artifact: {relative_path}")

@@ -10,11 +10,11 @@ from typing import Any, Mapping, Sequence
 
 
 MANIFEST_VERSION = "1.0.0"
-MANIFEST_ARTIFACTS = ("market.md", "customers.md", "gtm.md", "blueprint.md", "manifest.json")
+MANIFEST_ARTIFACTS = ("market_research.json", "customer_research.json", "gtm_strategy.json", "blueprint.md", "manifest.json")
 ARCHIVE_ENTRIES = (
-    "research/market.md",
-    "research/customers.md",
-    "strategy/gtm.md",
+    "research/market_research.json",
+    "research/customer_research.json",
+    "strategy/gtm_strategy.json",
     "blueprint.md",
     "manifest.json",
 )

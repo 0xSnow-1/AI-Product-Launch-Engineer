@@ -76,6 +76,14 @@ Trial 2 is the first run with the two-root layout.
 Both trials fail `source_citations` and `section_coverage`.
 Trial 2 adds a `delegation` budget failure and keeps the `manifest` failure.
 
+## Phase 1 Attempt Log: 2026-11-04
+
+`uv run python main.py --input tests/fixtures/launch_request.json --workspace-root /tmp/mvp-phase1` exited 1.
+The run stopped at the first Bedrock call with `AccessDeniedException` (authentication failed).
+No agent output, transcript, or artifact was produced.
+Unit tests, dataset validation, and the reference trial all pass on the phase 1 branch.
+The live CLI path stays unverified until Bedrock credentials that the operator controls are available.
+
 ## F-002: Customer research written to the project root
 
 **Status:** Fixed and verified
@@ -115,7 +123,7 @@ Trial 2 confirms the fix.
 
 ## F-003: Source citations are zero
 
-**Status:** Open
+**Status:** Fixed in code, live confirmation pending
 
 **Detected:** 2026-11-03
 
@@ -138,15 +146,19 @@ The agent also omitted URLs from the table.
 Material market, pricing, and competitor claims are not verifiable.
 This is the only real evidence-quality failure in trial 2.
 
-### Recommended fix
+### Resolution (2026-11-04, phase 1)
 
-Update the market research prompt to require bullet links under `Sources`.
-Each material claim must have one `- [title](url)` entry.
-Do not loosen the grader first.
+- The subagent prompts moved to v3 and require one JSON object with `claims[].evidence_refs`.
+- Every `fact` claim must carry at least one `EvidenceRef` with a title and an HTTP or HTTPS URL.
+  The contract enforces this in `Claim._fact_requires_evidence` and `EvidenceRef._url_must_be_http`.
+- `artifact_schemas` parses the JSON artifacts and reports contract errors.
+- `source_citations` counts unique titled HTTP or HTTPS evidence references across the JSON artifacts.
+- A live Bedrock run on 2026-11-04 ended with `AccessDeniedException` at the first model call, so live citation evidence is pending.
+  The reference trial (`evals/reference/b2b_recruiting_meeting_assistant/`) passes `source_citations` with four unique sources.
 
 ## F-004: Required headings do not match
 
-**Status:** Open
+**Status:** Fixed and verified
 
 **Detected:** 2026-11-03
 
@@ -166,7 +178,8 @@ Missing headings include:
 ### Cause
 
 The prompts say "include these sections" but do not say "use these exact headings".
-The agent paraphrased. Examples:
+The agent paraphrased.
+Examples:
 
 - `Competitive Landscape` instead of `Competitor Landscape`.
 - `Ideal Customer Profile (ICP)` instead of `Ideal Customer Profile`.
@@ -180,15 +193,17 @@ The agent paraphrased. Examples:
 Good content is scored as missing.
 The grader is not wrong. The output contract is ambiguous.
 
-### Recommended fix
+### Resolution (2026-11-04, phase 1)
 
-Add a new prompt version that names the exact H2 headings.
-Keep the grader strict.
-Do not normalize away real wording differences.
+- The three specialist Markdown artifacts are replaced by JSON artifacts validated against `src/contracts.py`.
+  Heading paraphrasing no longer applies to them.
+- `SectionCoverageGrader` stays strict and now covers `blueprint.md` only.
+- `evals/datasets/**/*.json` require sections only for `blueprint.md`.
+- `tests.test_reference_trial` and `tests.test_evaluation_harness` pass with the migrated artifacts.
 
 ## F-005: Manifest omits the supervisor
 
-**Status:** Open
+**Status:** Fixed and verified
 
 **Detected:** 2026-11-03
 
@@ -214,9 +229,15 @@ The manifest never satisfies the contract.
 Always add `supervisor` to `agents_used`.
 Add a unit test for the manifest agent list.
 
+### Resolution (2026-11-04, phase 1)
+
+- `collect_metrics` prepends `supervisor` to `agents_used` whenever the transcript contains at least one parsed event.
+- `tests/test_metrics.py::AgentsUsedTests` covers the supervisor-first ordering, the subagent ordering, and the missing-transcript case.
+- `tests/test_packaging.py` asserts the manifest `agents_used` set includes `supervisor`.
+
 ## F-006: Tool call budget exceeded
 
-**Status:** Open
+**Status:** Fixed in code, live confirmation pending
 
 **Detected:** 2026-11-03
 
@@ -244,9 +265,19 @@ Decide after the post-fix run.
 Raise the budget to 80, or reduce repeated reads in the research prompts.
 Do not raise the budget only to hide inefficiency.
 
+### Resolution (2026-11-04, phase 1)
+
+- The budget decision is recorded here: raise `max_tool_calls` from 60 to 80.
+  Trial 2 used 64 tool calls. Eighty leaves headroom for legitimate research without hiding runaway loops.
+  `evals/models.py` defaults to 80, every dataset in `evals/datasets/` sets 80, and `evals/spec.md` documents the default.
+- The research prompts (v3) instruct agents not to re-read files unless they must verify a write.
+- `evals/fixtures/transcripts/tool_loop.jsonl` was regenerated to 85 tool calls so the budget test still fails the loop.
+  `tests/test_delegation_grader.py` expects the 80-call budget.
+- Live confirmation of an under-budget run is pending: the 2026-11-04 CLI run stopped at the first model call with `AccessDeniedException` (Bedrock authentication).
+
 ## O-001: Token metrics are always zero
 
-**Status:** Open
+**Status:** Fixed in code, live confirmation pending
 
 **Detected:** 2026-11-03
 
@@ -271,3 +302,12 @@ Cost and token metrics cannot be tracked.
 
 Capture usage metadata at the model callback boundary.
 Write it as a structured field in the transcript event.
+
+### Resolution (2026-11-04, phase 1)
+
+- `src/transcript.py` writes a structured `usage` field on `model_finished` events.
+  It reads `message.usage_metadata` from each generation first, then message `response_metadata.usage`, then `llm_output.usage` and top-level token keys (camelCase or snake_case).
+  When only input and output counts exist, it derives `total_tokens` as their sum.
+- `collect_metrics` sums `usage.total_tokens` and falls back to `input_tokens + output_tokens`.
+- `tests/test_metrics.py::UsageCaptureTests` covers generation metadata, the `llm_output` fallback, the derived total, and cross-event summation.
+- Live confirmation is pending: the 2026-11-04 CLI run stopped at the first model call with `AccessDeniedException` before any usage metadata was produced.

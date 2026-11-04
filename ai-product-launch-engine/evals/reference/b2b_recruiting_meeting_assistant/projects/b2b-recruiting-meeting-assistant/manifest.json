@@ -5,9 +5,9 @@
     "version": "1.0.0"
   },
   "artifacts": [
-    "market.md",
-    "customers.md",
-    "gtm.md",
+    "market_research.json",
+    "customer_research.json",
+    "gtm_strategy.json",
     "blueprint.md",
     "manifest.json"
   ],

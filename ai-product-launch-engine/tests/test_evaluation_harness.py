@@ -19,17 +19,91 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SEED_DATASET = PROJECT_ROOT / "evals" / "datasets" / "capability" / "b2b_recruiting_meeting_assistant.json"
 
 
+def _market_research(project_slug: str) -> dict:
+    now = "2026-11-01T00:00:00Z"
+    evidence = [
+        ("Bureau of Labor Statistics", "https://www.bls.gov/oes/current/oes131072.htm"),
+        ("U.S. Census Bureau", "https://www.census.gov/programs-surveys.html"),
+        ("Federal Trade Commission", "https://www.ftc.gov/business-guidance"),
+    ]
+    return {
+        "project_id": project_slug,
+        "generated_at": now,
+        "summary": "Narrow recruiting niche with a clear gap.",
+        "competitors": [
+            {"name": "Example ATS", "positioning": "Applicant tracking with add-ons"}
+        ],
+        "market_opportunities": ["Small agencies lack structured intake notes"],
+        "trends": ["Remote intake calls are common"],
+        "claims": [
+            {
+                "id": f"market-{index}",
+                "text": f"Sourced claim {index}.",
+                "kind": "fact",
+                "evidence_refs": [
+                    {
+                        "title": title,
+                        "url": url,
+                        "retrieved_at": now,
+                        "claim_ids": [f"market-{index}"],
+                    }
+                ],
+            }
+            for index, (title, url) in enumerate(evidence, 1)
+        ],
+        "assumptions": ["Agencies will pilot within 90 days"],
+        "limitations": ["No primary survey was run"],
+    }
+
+
+def _customer_research(project_slug: str) -> dict:
+    return {
+        "project_id": project_slug,
+        "generated_at": "2026-11-01T00:00:00Z",
+        "segments": [{"name": "Small agencies", "description": "5 to 50 recruiters"}],
+        "personas": [{"name": "Agency owner", "role": "buyer"}],
+        "pain_points": ["Notes are retyped into the ATS"],
+        "buying_triggers": ["New client volume exceeds capacity"],
+        "ideal_customer_profile": "US recruiting agency with 5 to 50 recruiters",
+        "claims": [],
+        "assumptions": ["Owners approve pilots"],
+        "limitations": ["Interview data is hypothetical"],
+    }
+
+
+def _gtm_strategy(project_slug: str) -> dict:
+    return {
+        "project_id": project_slug,
+        "generated_at": "2026-11-01T00:00:00Z",
+        "positioning": "The intake-call assistant for small recruiting agencies",
+        "differentiation": "Structured notes and ATS follow-up actions",
+        "target_segments": ["Small US recruiting agencies"],
+        "pricing_hypotheses": ["Low monthly fee per recruiter"],
+        "channels": ["Direct outreach", "ATS marketplaces"],
+        "launch_roadmap": [
+            {"name": "Pilot", "timeline": "Weeks 1 to 6", "activities": ["Recruit ten agencies"]}
+        ],
+        "risks": ["ATS integration access delays the pilot"],
+        "assumptions": ["Agencies accept a paid pilot"],
+        "claims": [],
+    }
+
+
 def _write_complete_trial(task, trial_root: Path) -> None:
     project_root = trial_root / "projects" / task.expected.project_slug
     contents: dict[str, str] = {}
     for virtual_path, headings in task.expected.required_sections.items():
         relative_path = virtual_path.removeprefix(f"/projects/{task.expected.project_slug}/")
         contents[relative_path] = "\n".join(f"# {heading}" for heading in headings) + "\n"
-    contents["research/market.md"] += (
-        "\n- [Bureau of Labor Statistics](https://www.bls.gov/oes/current/oes131072.htm)\n"
-        "- [U.S. Census Bureau](https://www.census.gov/programs-surveys.html)\n"
-        "- [Federal Trade Commission](https://www.ftc.gov/business-guidance)\n"
-    )
+    json_artifacts = {
+        "research/market_research.json": _market_research(task.expected.project_slug),
+        "research/customer_research.json": _customer_research(task.expected.project_slug),
+        "strategy/gtm_strategy.json": _gtm_strategy(task.expected.project_slug),
+    }
+    for relative_path, payload in json_artifacts.items():
+        target = project_root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     for relative_path, content in contents.items():
         target = project_root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -41,7 +115,7 @@ def _write_complete_trial(task, trial_root: Path) -> None:
             "created_at": "2026-11-01T00:00:00Z",
             "version": "1.0.0",
         },
-        "artifacts": ["market.md", "customers.md", "gtm.md", "blueprint.md", "manifest.json"],
+        "artifacts": ["market_research.json", "customer_research.json", "gtm_strategy.json", "blueprint.md", "manifest.json"],
         "execution": {
             "agents_used": list(task.expected.manifest_agents),
             "total_turns": 4,
@@ -126,20 +200,22 @@ class EvaluationHarnessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             trial_root = Path(temporary_directory)
             _write_complete_trial(self.task, trial_root)
-            market_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "market.md"
+            market_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "market_research.json"
             market_path.unlink()
             report = grade_trial(self.task, trial_root)
         artifact_result = next(result for result in report.results if result.grader_name == "artifact_exists")
         self.assertFalse(report.passed)
         self.assertFalse(artifact_result.passed)
-        self.assertIn("/projects/b2b-recruiting-meeting-assistant/research/market.md", artifact_result.details["missing_artifacts"])
+        self.assertIn("/projects/b2b-recruiting-meeting-assistant/research/market_research.json", artifact_result.details["missing_artifacts"])
 
     def test_invalid_source_url_fails_even_when_the_source_minimum_is_met(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             trial_root = Path(temporary_directory)
             _write_complete_trial(self.task, trial_root)
-            market_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "market.md"
-            market_path.write_text(f"{market_path.read_text(encoding='utf-8')}\n- [Invalid](ftp://example.com)\n", encoding="utf-8")
+            market_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "market_research.json"
+            market = json.loads(market_path.read_text(encoding="utf-8"))
+            market["claims"][0]["evidence_refs"][0]["url"] = "ftp://example.com"
+            market_path.write_text(json.dumps(market), encoding="utf-8")
             report = grade_trial(self.task, trial_root)
         citation_result = next(result for result in report.results if result.grader_name == "source_citations")
         self.assertFalse(citation_result.passed)
@@ -149,12 +225,14 @@ class EvaluationHarnessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             trial_root = Path(temporary_directory)
             _write_complete_trial(self.task, trial_root)
-            customer_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "customers.md"
-            customer_path.write_text(f"{customer_path.read_text(encoding='utf-8')}\n[citation needed]\n", encoding="utf-8")
+            customer_path = trial_root / "projects" / self.task.expected.project_slug / "research" / "customer_research.json"
+            customer = json.loads(customer_path.read_text(encoding="utf-8"))
+            customer["limitations"] = ["[citation needed]"]
+            customer_path.write_text(json.dumps(customer), encoding="utf-8")
             report = grade_trial(self.task, trial_root)
         placeholder_result = next(result for result in report.results if result.grader_name == "placeholders")
         self.assertFalse(placeholder_result.passed)
-        self.assertIn("[citation needed]", placeholder_result.details["placeholders"]["/projects/b2b-recruiting-meeting-assistant/research/customers.md"])
+        self.assertIn("[citation needed]", placeholder_result.details["placeholders"]["/projects/b2b-recruiting-meeting-assistant/research/customer_research.json"])
 
     def test_runner_validates_the_dataset_without_trial_artifacts(self) -> None:
         output = io.StringIO()
